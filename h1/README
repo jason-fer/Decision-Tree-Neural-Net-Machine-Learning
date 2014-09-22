@@ -11,3 +11,8 @@
 Due Mon Sept 29th.
 
 This program implements an ID3-like decision-tree learner for classification.
+
+-Each function runs a specific part of the algorithm
+-Unit test each function to be sure it runs correctly
+-Think about possible edge cases already brought up in class -- at least test those
+-Figure out additional test cases that need to be considered
