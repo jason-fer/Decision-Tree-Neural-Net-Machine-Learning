@@ -10,6 +10,7 @@ Node = decision_tree.Node
 negative = 'negative'
 positive = 'positive'
 
+
 def count_data_with_attr(data, attr):
 	count = 0
 	for row in data:
@@ -26,54 +27,76 @@ def count_data_with_attr(data, attr):
 	print 'the count:' + str(count)
 	return count
 
+
 def determine_candidate_splits(data, attributes):
 	"""splits on nominal features have one branch per value"""
 	"""splits on numeric features use a threshold"""
-	candidates = []
-	
+	splits = {}
+	num_items = len(data)
+
 	for attr in attributes:
 		feature = attributes.get(attr)
 		the_type = feature.get('type')
 
 		if the_type == 'numeric':
-			candidates.append(numeric_candidate_splits(data, feature))
+			splits[attr] = numeric_candidate_splits(data, feature, num_items)
+			# print len(splits[attr].get('left_branch'))
+			# print len(splits[attr].get('right_branch'))
 		elif the_type == 'nominal':
-			candidates.append(nominal_candidate_splits(data, feature))
+			# candidates.append(nominal_candidate_splits(data, feature, num_items))
+			pass
 		else:
 			pass
 
-	return candidates
-	
-	
-	# Numeric candidate splits:
-	# -given a set of training instances D and a specific feature Xi
-	# -sort the values of Xi in D
-	# -evaluate split thresholds in intervals between instances of 
-	# different classes 
-	# -could use midpoint of each considered interval as the threshold
-	# does not exceed the midpoint
+	return splits
 
-def nominal_candidate_splits(data, feature):
+
+def nominal_candidate_splits(data, feature, num_items):
+	#simple.......
+	# Candidate splits for nominal features should have one branch per value of 
+	# the nominal feature. The branches should be ordered according to the order 
+	# of the feature values listed in the ARFF file.	
+
+	# candidates = {} # initialize set of candidate splits for feature Xi
+	# S = partition instances in D into sets s1 ... sV where the instances in each
+	#   set have the same value for Xi
+	# let vj denote the value of Xi for set sj
+	# sort the sets in S using vj as the key for each sj
+
+	# for each pair of adjacent sets sj, sj+1 in sorted S
+	#   if sj and sj+1 contain a pair of instances with different class labels
+	#     # assume were using midpoints for splits 
+	#     add candidate split Xi <= (vj + vj+1)/2 to candidates
+	# return candidates
 	pass
 
-def numeric_candidate_splits(data, feature):
-	print 'feature!!!!!!!!!!!!!!!!!!!!!'
-	print feature
-	exit(0)
-	pass
-# 	 candidates = {} # initialize set of candidate splits for feature Xi
-# 	 S = partition instances in D into sets s1 ... sV where the instances in each
-# 	   set have the same value for Xi
-# 	 let vj denote the value of Xi for set sj
-# 	 sort the sets in S using vj as the key for each sj
 
-# 	 for each pair of adjacent sets sj, sj+1 in sorted S
-# 	   if sj and sj+1 contain a pair of instances with different class labels
-# 	     # assume were using midpoints for splits 
-# 	     add candidate split Xi <= (vj + vj+1)/2 to candidates
-# 	 return candidates
+def numeric_candidate_splits(data, feature, num_items):
+	# sort data by feature value asc
+	index = feature.get('index')
+	sorted_data = sorted(data, key=lambda x: x[index])
+	grand_total = sum(row[index] for row in sorted_data)
+
+	midpoint = grand_total / num_items; #is my midpoint incorrect? (incomplete??)
+
+	candidate_split = { 
+		'feature': feature, 
+		'left_branch': [], 
+		'right_branch': [],
+		'threshold': midpoint,
+		}
+
+	# split the data-sets based on the threshold (midpoint)
+	for instance in data:
+		if instance[index] < midpoint:
+			candidate_split['left_branch'].append(instance)
+		else:
+			candidate_split['right_branch'].append(instance)
+
+	return candidate_split
 
 def stopping_criteria_is_met(candidates):
+	# The stopping criteria (for making a node into a leaf) are that (i) all of the training instances reaching the node belong to the same class, or (ii) there are fewer than m training instances reaching the node, where m is provided as input to the program, or (iii) no feature has positive information gain, or (iv) there are no more remaining candidate splits at the node.
 	# stop if:
 	# 1. candidates all have the same class
 	# 2. candidates is empty
@@ -111,6 +134,8 @@ def make_subtree(data, attributes):
  #     node.children.add = make_subtree(Dk) 
  # return node
 
+
+# Splits should be chosen using information gain. If there is a tie between two features in their information gain, you should break the tie in favor of the feature listed first in the header section of the ARFF file. If there is a tie between two different thresholds for a numeric feature, you should break the tie in favor of the smaller threshold.
 #  OrdinaryFindBestSplit(set of training instances D, set of candidate splits C) 
 def find_best_split(data, candidates):
 	pass
