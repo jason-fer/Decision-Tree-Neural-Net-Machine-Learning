@@ -2,6 +2,36 @@ from lib import arff
 import decision_tree
 
 
+def count_data_with_attr(data, attr):
+  count = 0
+  for row in data:
+    for item in row:
+      print item
+      print attr
+      exit(0)
+      if str(item).decode("utf-8") == str(attr).decode("utf-8"):
+        count = count + 1
+        break
+      else:
+        pass
+
+  print 'the count:' + str(count)
+  return count
+
+def dump_splits(splits):
+  print '>>>>>>>>          *** Dumping Splits ***          <<<<<<<<'
+
+  for x in splits:
+    type_of = str(type(splits[x]))
+    if type_of == "<class 'decision_tree.NominalCandidateSplit'>":
+      print splits[x] 
+    elif type_of == "<class 'decision_tree.NumericCandidateSplit'>":
+      print splits[x] 
+    else:
+      pass
+
+  exit(0)
+
 # turn attributes into something manageable
 def get_attributes(attr_data):
   attributes = {}
