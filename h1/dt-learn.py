@@ -32,20 +32,17 @@ def determine_candidate_splits(data, attributes):
 	candidates = []
 	
 	for attr in attributes:
-		info = attributes.get(attr)
-		if type(info) == unicode or type(info) == str:
-			feature = {'name':attr, 'type': 'numeric', 'options': info }
-			# count data items with this feature
-			count = count_data_with_attr(data, attr)
-			print count
-			candidates.append(numeric_candidate_splits(data, feature))
-		else:
-			feature = {'name':attr, 'type': 'nominal', 'options': info }
-			# count data items with this feature xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-			# count = 
-			candidates.append(nominal_candidate_splits(data, feature))
+		feature = attributes.get(attr)
+		the_type = feature.get('type')
 
-	exit(0)
+		if the_type == 'numeric':
+			candidates.append(numeric_candidate_splits(data, feature))
+		elif the_type == 'nominal':
+			candidates.append(nominal_candidate_splits(data, feature))
+		else:
+			pass
+
+	return candidates
 	
 	
 	# Numeric candidate splits:
@@ -60,6 +57,7 @@ def nominal_candidate_splits(data, feature):
 	pass
 
 def numeric_candidate_splits(data, feature):
+	print 'feature!!!!!!!!!!!!!!!!!!!!!'
 	print feature
 	exit(0)
 	pass
@@ -139,7 +137,6 @@ def evaluate_split(data, candidates, subset):
 	#      Sk = OrdinaryFindBestSplit(Dk, C - S) 
 	#      // return information gain that would result from this 2-level subtree
 	#    return HD(Y) - HD(Y | S,S1,S2)
-
 
 
 def main(args):
