@@ -1,15 +1,17 @@
 from lib import arff 
 import sys, decision_tree, helpers, math
 
+#helpers
 dump_attributes = helpers.dump_attributes
 load_data = helpers.load_data
 homogenous_check = helpers.homogenous_check
 get_attributes = helpers.get_attributes
-DecisionTree = decision_tree.DecisionTree
-Node = decision_tree.Node
-negative = 'negative'
-positive = 'positive'
 
+#d-tree structs
+DecisionTree = decision_tree.DecisionTree
+NumericCandidateSplit = decision_tree.NumericCandidateSplit
+NominalCandidateSplit = decision_tree.NominalCandidateSplit
+Node = decision_tree.Node
 
 def count_data_with_attr(data, attr):
 	count = 0
@@ -29,71 +31,80 @@ def count_data_with_attr(data, attr):
 
 
 def determine_candidate_splits(data, attributes):
-	"""splits on nominal features have one branch per value"""
-	"""splits on numeric features use a threshold"""
+	"""Determine all possible candidate splits"""
 	splits = {}
 	num_items = len(data)
 
 	for attr in attributes:
 		feature = attributes.get(attr)
-		the_type = feature.get('type')
 
-		if the_type == 'numeric':
+		if feature.get('type') == 'numeric':
 			splits[attr] = numeric_candidate_splits(data, feature, num_items)
-			# print len(splits[attr].get('left_branch'))
-			# print len(splits[attr].get('right_branch'))
-		elif the_type == 'nominal':
-			# candidates.append(nominal_candidate_splits(data, feature, num_items))
+		elif feature.get('type') == 'nominal':
+			splits[attr] = nominal_candidate_splits(data, feature, num_items)
 			pass
 		else:
+			# the class variable
 			pass
+
+	# delete all splits that have no instances
+
+	for x in splits:
+		print splits[x]
+	exit(0)
 
 	return splits
 
 
 def nominal_candidate_splits(data, feature, num_items):
-	#simple.......
-	# Candidate splits for nominal features should have one branch per value of 
-	# the nominal feature. The branches should be ordered according to the order 
-	# of the feature values listed in the ARFF file.	
-
+	"""splits on nominal features have one branch per value"""
 	# candidates = {} # initialize set of candidate splits for feature Xi
 	# S = partition instances in D into sets s1 ... sV where the instances in each
 	#   set have the same value for Xi
 	# let vj denote the value of Xi for set sj
 	# sort the sets in S using vj as the key for each sj
 
-	# for each pair of adjacent sets sj, sj+1 in sorted S
-	#   if sj and sj+1 contain a pair of instances with different class labels
-	#     # assume were using midpoints for splits 
-	#     add candidate split Xi <= (vj + vj+1)/2 to candidates
-	# return candidates
-	pass
+	index = feature.get('index')
+	branches = {}
+
+	count = 0
+	# one branch per option in the feature vector
+	# order must match the attribute order in ARFF file
+	for branch_name in feature.get('options'):
+		branches[branch_name] = {'name':branch_name, 'xxx':, 'xxx': }
+
+	print branches
+	exit(0)
+
+	# split the data-sets based on the feature options
+	# for instance in data:
+	# 	if instance[index] < threshold:
+	# 		branches.append(instance)
+	# 		right_branch.append(instance)
+
+	# return NominalCandidateSplit(feature, branches, threshold)
 
 
 def numeric_candidate_splits(data, feature, num_items):
-	# sort data by feature value asc
+	"""splits on numeric features use a threshold"""
+	"""sort data by feature value asc"""
 	index = feature.get('index')
 	sorted_data = sorted(data, key=lambda x: x[index])
 	grand_total = sum(row[index] for row in sorted_data)
 
-	midpoint = grand_total / num_items; #is my midpoint incorrect? (incomplete??)
-
-	candidate_split = { 
-		'feature': feature, 
-		'left_branch': [], 
-		'right_branch': [],
-		'threshold': midpoint,
-		}
+	# initialize our branches & threshold (midpoint)
+	threshold = grand_total / num_items; #is my midpoint incorrect? (incomplete??)
+	left_branch = []
+	right_branch = []
 
 	# split the data-sets based on the threshold (midpoint)
 	for instance in data:
-		if instance[index] < midpoint:
-			candidate_split['left_branch'].append(instance)
+		if instance[index] < threshold:
+			left_branch.append(instance)
 		else:
-			candidate_split['right_branch'].append(instance)
+			right_branch.append(instance)
 
-	return candidate_split
+	return NumericCandidateSplit(feature, left_branch, right_branch, threshold)
 
 def stopping_criteria_is_met(candidates):
 	# The stopping criteria (for making a node into a leaf) are that (i) all of the training instances reaching the node belong to the same class, or (ii) there are fewer than m training instances reaching the node, where m is provided as input to the program, or (iii) no feature has positive information gain, or (iv) there are no more remaining candidate splits at the node.

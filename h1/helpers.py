@@ -8,7 +8,7 @@ def get_attributes(attr_data):
   index = 0
 
   for key in attr_data:
-    attribute_data = { 'index': index, 'options': key[1] }
+    attribute_data = {'name':key[0], 'index': index, 'options': key[1] }
 
     if key[0] == 'class':
       attribute_data['type'] = 'class' 
