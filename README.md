@@ -12,3 +12,7 @@ pip install --install-option="--prefix=/Users/jason/Sites/cs760/cs760-homework/h
 
 
 ~/Sites/cs760/cs760-homework/h1
+
+
+Non ASCII characters:
+[^\x00-\x7F]
