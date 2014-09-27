@@ -58,8 +58,7 @@ def data_subset(data, outcome):
 	# return subset_of_data
 
 def make_subtree(data):
-	pass
- # candidates = determine_candidate_splits(data)
+ candidates = determine_candidate_splits(data)
  # if stopping_criteria_is_met(candidates):
  #   # determine class label/probabilities for N
  #   # use that to build the leaf node
