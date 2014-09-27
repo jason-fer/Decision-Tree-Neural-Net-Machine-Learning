@@ -4,6 +4,7 @@ import sys, decision_tree, helpers, math
 dump_attributes = helpers.dump_attributes
 load_data = helpers.load_data
 homogenous_check = helpers.homogenous_check
+get_attributes = helpers.get_attributes
 DecisionTree = decision_tree.DecisionTree
 Node = decision_tree.Node
 attributes = None
@@ -57,22 +58,23 @@ def data_subset(data, outcome):
 	# return subset_of_data
 
 def make_subtree(data):
- candidates = determine_candidate_splits(data)
- if stopping_criteria_is_met(candidates):
-   # determine class label/probabilities for N
-   # use that to build the leaf node
-   node = Node('attribute', 'value')
- else:
-   # make an internal node N
-   node = Node('attribute', 'value')
-   splits = find_best_split(data, candidates) 
-   # for each outcome k of splits
-   for outcome in splits:
-     # subset_of_data = subset of instances that have outcome k
-     subset_of_data = data_subset(data, outcome)
-     # kth child of N = make_subtree(Dk) 
-     node.children.add = make_subtree(Dk) 
- return node
+	pass
+ # candidates = determine_candidate_splits(data)
+ # if stopping_criteria_is_met(candidates):
+ #   # determine class label/probabilities for N
+ #   # use that to build the leaf node
+ #   node = Node('attribute', 'value')
+ # else:
+ #   # make an internal node N
+ #   node = Node('attribute', 'value')
+ #   splits = find_best_split(data, candidates) 
+ #   # for each outcome k of splits
+ #   for outcome in splits:
+ #     # subset_of_data = subset of instances that have outcome k
+ #     subset_of_data = data_subset(data, outcome)
+ #     # kth child of N = make_subtree(Dk) 
+ #     node.children.add = make_subtree(Dk) 
+ # return node
 
 #  OrdinaryFindBestSplit(set of training instances D, set of candidate splits C) 
 def find_best_split(data, candidates):
@@ -102,6 +104,7 @@ def evaluate_split(data, candidates, subset):
 	#    return HD(Y) - HD(Y | S,S1,S2)
 
 
+
 def main(args):
 	"""usage dt-learn <train-set-file> <test-set-file> m """
 	"""where m is the number of training instances; used in stopping criteria"""
@@ -109,16 +112,14 @@ def main(args):
 	# init
 	# arff_file = load_data('examples/diabetes_train.arff')
 	arff_file = load_data('examples/heart_train.arff')
-	attributes = arff_file['attributes']
-	attr_count = len(attributes)
-	data = arff_file['data']
-	class_labels = attributes[-1][1]
+	attributes = get_attributes(arff_file['attributes'])
+	class_labels = attributes.get('class')
 	negative = class_labels[0]
 	positive = class_labels[1]
-
-	dtree = DecisionTree()
+	data = arff_file['data']
 
 	# homogenous check (incomplete)
+	dtree = DecisionTree()
 	is_homogenous, result = homogenous_check(data, class_labels, negative, positive);
 	if result != None:
 		# need to produce a single node tree

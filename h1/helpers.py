@@ -1,5 +1,13 @@
 from lib import arff 
 
+# turn attributes into something manageable
+def get_attributes(attr_data):
+  attributes = {}
+  for key in attr_data:
+    attributes[str(key[0])] = key[1]
+
+  return attributes
+  
 def homogenous_check(data, class_labels, negative, positive):
   # are all examples one type? (all pos / all neg)
   positive_found = False
