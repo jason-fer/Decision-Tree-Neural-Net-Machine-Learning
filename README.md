@@ -11,3 +11,4 @@ You might also want to use --ignore-installed to force all dependencies to be re
 pip install --install-option="--prefix=/Users/jason/Sites/cs760/cs760-homework/h1/scripts"  arff --ignore-installed
 
 
+~/Sites/cs760/cs760-homework/h1

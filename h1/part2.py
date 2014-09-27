@@ -17,7 +17,7 @@
 #
 # Plot points for training set sizes that represent 5%, 10%, 20%, 50% and 100% 
 # of the instances in each given training file. For each training-set 
-# size (except the largest one), randomly draw 10 different training sets and 
+# size (except the largest one), randomly draw 10 different training sets and <--random sampling!
 # evaluate each resulting decision tree model on the test set. For each training
 # set size, plot the average test-set accuracy and the minimum and maximum 
 # test-set accuracy. Label the axes of the plots. Set the stopping criterion m=4
