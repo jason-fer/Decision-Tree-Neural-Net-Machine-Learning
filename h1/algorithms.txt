@@ -14,9 +14,6 @@ MakeSubtree(set of training instances D)
  return subtree rooted at N
 
 
--splits on nominal features have one branch per value 
--splits on numeric features use a threshold 
-
 Numeric candidate splits:
 -given a set of training instances D and a specific feature Xi
 -sort the values of Xi in D
@@ -52,14 +49,6 @@ OrdinaryFindBestSplit(set of training instances D, set of candidate splits C)
 
  return Sbest
 
-LookaheadFindBestSplit(set of training instances D, set of candidate splits C) 
- maxgain = negative infinity
- for each split S in C
-   gain = EvaluateSplit(D, C, S) 
-   if gain > maxgain
-     maxgain = gain
-     Sbest = S
- return Sbest
 
 EvaluateSplit(D, C, S)
  if a split on S separates instances by class (i.e. ) HD (Y | S) = 0

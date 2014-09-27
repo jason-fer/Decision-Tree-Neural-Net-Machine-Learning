@@ -1,14 +1,28 @@
 from lib import arff 
+import decision_tree
+
 
 # turn attributes into something manageable
 def get_attributes(attr_data):
   attributes = {}
+  index = 0
+
   for key in attr_data:
-    attributes[str(key[0])] = key[1]
+    attribute_data = { 'index': index, 'options': key[1] }
+
+    if key[0] == 'class':
+      attribute_data['type'] = 'class' 
+    elif type(key[1]) == unicode or type(key[1]) == str:
+      attribute_data['type'] = 'numeric'
+    else:
+      attribute_data['type'] = 'nominal'
+
+    attributes[key[0]] = attribute_data
+    index = index + 1
 
   return attributes
   
-def homogenous_check(data, class_labels, negative, positive):
+def homogenous_check(data, negative, positive):
   # are all examples one type? (all pos / all neg)
   positive_found = False
   negative_found = False
