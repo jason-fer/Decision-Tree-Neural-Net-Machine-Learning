@@ -20,18 +20,22 @@ def stopping_criteria_is_met(candidates, data, m, attributes):
 	# stop if:
 	candidate_count = len(data)
 	# 1. candidates all have the same class
-	if candidates.is_homogenous(data, attributes):
-		return True
+	is_homogenous, result = candidates.is_homogenous(data, attributes)
+	if is_homogenous:
+		print candidate_count
+		return True, result
 	# 2. there are fewer than m training instances reaching the node
-	# 4. or candidates is empty
-	elif candidate_count == 0 or candidate_count < m:
-		return True
+	elif candidate_count == 0:
+		return True, 0
 	# 3. no feature has positive information gain (incomplete)
 	elif candidates.no_info_gain():
-		return True
+		return True, 'no_info_gain'
+	# 4. or candidates is empty
+	elif candidate_count < m:
+		return True, 'm'
 	else:
 		# Stopping criterian wasn't met
-		return False
+		return False, None
 
 def data_subset(data, outcome):
 	# list each piece of data in the subset that matches the outcome
@@ -42,7 +46,8 @@ def make_subtree(data, attributes, m):
 	candidates = determine_candidate_splits(data, attributes)
 
 	# candidates.test_split_counts(data) #debug
-	if stopping_criteria_is_met(candidates, data, m, attributes):
+	stop_now, reason = stopping_criteria_is_met(candidates, data, m, attributes)
+	if stop_now:
 	#   # determine class label/probabilities for N
 	#   # use that to build the leaf node
 	#   node = Node('attribute', 'value')
