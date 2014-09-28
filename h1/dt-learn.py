@@ -54,9 +54,8 @@ def make_subtree(data, attributes, m):
 		pass
 	else:
 	  # make an internal node N
-	  print 'hi'
+	  split = candidates.find_best_split(data)
 	  exit(0)
-	  split = find_best_split(data, candidates)
 	  print split
 		#   node = Node('attribute', 'value')
 		#   # for each outcome k of splits
@@ -66,34 +65,6 @@ def make_subtree(data, attributes, m):
 		#     # kth child of N = make_subtree(Dk) 
 		#     node.children.add = make_subtree(Dk) 
 		# return node
-
-
-# Splits should be chosen using information gain. If there is a tie between two features in their information gain, you should break the tie in favor of the feature listed first in the header section of the ARFF file. If there is a tie between two different thresholds for a numeric feature, you should break the tie in favor of the smaller threshold.
-#  OrdinaryFindBestSplit(set of training instances D, set of candidate splits C) 
-def find_best_split(data, candidates):
-	maxgain = -1
-	#  for each split S in C
-	#    gain = InfoGain(D, S) 
-	#    if gain > maxgain
-	#      maxgain = gain
-	#      Sbest = S
-
-	#  return Sbest
-
-
-# EvaluateSplit(D, C, S)
-def evaluate_split(data, candidates, subset):
-	pass
-	#  if a split on S separates instances by class (i.e. ) HD (Y | S) = 0
-	#    // no need to split further 
-	#    return H_D(Y) - H_D(Y | S)
-	#  else 
-	#    for outcomes k in set {1, 2} of S // let's assume binary splits
-	#      // see what the splits at the next level would be
-	#      Dk = subset of instances that have outcome k
-	#      Sk = OrdinaryFindBestSplit(Dk, C - S) 
-	#      // return information gain that would result from this 2-level subtree
-	#    return HD(Y) - HD(Y | S,S1,S2)
 
 
 def main(args):
