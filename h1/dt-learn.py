@@ -7,6 +7,7 @@ load_data = helpers.load_data
 dump_splits = helpers.dump_splits
 homogenous_check = helpers.homogenous_check
 get_attributes = helpers.get_attributes
+get_class_counts = helpers.get_class_counts
 
 #d-tree structs
 DecisionTree = decision_tree.DecisionTree
@@ -38,33 +39,80 @@ def stopping_criteria_is_met(candidates, data, m, attributes):
 		# Stopping criterian wasn't met
 		return False, None
 
-def data_subset(data, outcome):
-	# list each piece of data in the subset that matches the outcome
-	pass
-	# return subset_of_data
+def split_data_on_feature(data, feature_info, value, attributes):
+	# value: the current option
+	# data: all instances
+	# feature_info: from the arf file.
+	index = feature_info.get('index')
+	subset = []
+	for row in data:
+		if row[index] == value:
+			subset.append(row)
+		else:
+			pass
+
+	class_labels = attributes.get('class').get('options')
+	p_count, n_count = get_class_counts(subset, class_labels[0], class_labels[1])
+
+	if len(subset) != (p_count + n_count):
+		raise ValueError('subset instance count doesnt match neg / pos count')
+	else:
+		return subset, p_count, n_count
+
+
+def generate_nodes(data, split, attributes):
+	# use the data to generate a node for best split
+	# name, attribute, value, neg_count, pos_count, data
+	nodes = [] # either left, then right or a list
+
+	info_gain = split.get('info_gain')
+	# split on this feature
+	feature = split.get('name') # name of attribute
+	feature_options = attributes.get(feature).get('options')
+	feature_info = attributes.get(feature)
+
+	split = split.get('split')
+	split_type = split.get_type()
+
+	if split_type == 'nominal split': # decision_tree.NominalCandidateSplit
+		for value in feature_options:
+			subset, p, n = split_data_on_feature(data, feature_info, value, attributes)
+			# nothing to do if there's nothing in the subset
+			if len(subset) != 0:
+				print 'nominal node created! :' + str(value) + ', size: ' + str(len(subset))
+				nodes.append(NominalNode(feature, value, info_gain, data, p, n))
+			else:
+				pass
+	else: # 'numeric split' decision_tree.NumericCandidateSplit
+			subset, p, n = split_data_on_feature(data, feature_info, value, attributes)
+			# nothing to do if there's nothing in the subset
+			if len(subset) != 0:
+				print 'numeric node created! :' + str(value) + ', size: ' + str(len(subset))
+				nodes.append(NumericNode(feature, value, info_gain, data, p, n))
+			else:
+				pass
+
+	return nodes
 
 def make_subtree(data, attributes, m):
 	candidates = determine_candidate_splits(data, attributes)
 
+	nodes = []
 	# candidates.test_split_counts(data) #debug
 	stop_now, reason = stopping_criteria_is_met(candidates, data, m, attributes)
 	if stop_now: # leaf-node
-	#   # determine class label/probabilities for N
-	  # node = Node('attribute', 'value')
+		print 'reason!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+		print reason
+		raise ValueError('stopping function not written')
+		#   # determine class label/probabilities for N
+	  # node = Node('attribute', 'value') ?
 		pass
 	else:
 	  # make an internal node N
 	  split = candidates.find_best_split(data, attributes)
-	  exit(0)
-	  print split
-		#   node = Node('attribute', 'value')
-		#   # for each outcome k of splits
-		#   for outcome in splits:
-		#     # subset_of_data = subset of instances that have outcome k
-		#     subset_of_data = data_subset(data, outcome)
-		#     # kth child of N = make_subtree(Dk) 
-		#     node.children.add = make_subtree(Dk) 
-		# return node
+	  nodes = generate_nodes(data, split, attributes)
+
+	return nodes
 
 
 def main(args):

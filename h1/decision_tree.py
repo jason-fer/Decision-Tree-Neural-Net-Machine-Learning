@@ -4,16 +4,16 @@ homogenous_check = helpers.homogenous_check
 get_class_counts = helpers.get_class_counts
 
 # ***************** DECISION TREE NODE *****************
-class NumericNode(object):
+class Node(object):
 	"""Numeric, Nominal, or Class decision tree node (with a list of results)"""
-	def __init__(self, name, attribute, value, neg_count, pos_count):
-		self.name = name
-		self.attribute = attribute
+	def __init__(self, feature, value, info_gain, data, pos, neg):
+		self.feature = feature
 		self.value = value
-		# number of negative classes with this attribute
-		self.neg_count = neg_count
-		# number of positive classes with this attribute
-		self.pos_count = pos_count
+		self.info_gain = info_gain
+		# number of neg / pos classes with this attribute
+		self.pos_count = pos
+		self.neg_count = neg
+		self.data = data
 		self.children = []
 
 	# def __repr__(self):
@@ -23,42 +23,26 @@ class NumericNode(object):
 	# 	obj_string = ''
 
 	def get_type(self):
-		return 'nominal'
+		return 'generic node'
 
 	def is_leaf(self):
 		return self.children == []
 
-class NominalNode(object):
-	"""Numeric, Nominal, or Class decision tree node (with a list of results)"""
-	def __init__(self, name, attribute, value, neg_count, pos_count):
-		self.name = name
-		self.attribute = attribute
-		self.value = value
-		# number of negative classes with this attribute
-		self.neg_count = neg_count
-		# number of positive classes with this attribute
-		self.pos_count = pos_count
-		self.left_child = {}
-		self.right_child = {}
-
-	# def __repr__(self):
-	# 	# thal = fixed_defect [4 6]
-	# 	# nominal: attr = value [neg pos]
-	# 	# numeric: attr <= value [neg pos]
-	# 	obj_string = ''
-
+class NumericNode(Node):
+	"""Numeric decision tree node"""
 	def get_type(self):
-		return 'numeric'
+		return 'nominal node'
 
-	def is_leaf(self):
-		return self.left_child == {} and self.right_child == {}
-		
+class NominalNode(Node):
+	"""Nominal decision tree node"""
+	def get_type(self):
+		return 'numeric node'
 
 # ******************** DECISION TREE ********************
 class DecisionTree(object):
 	"""Machine Learning Decision Tree Structure"""
 	def __init__(self):
-		self.root = None
+		self.root = []
 
 	def printTree(self):
 		# print the Decision Tree
@@ -210,7 +194,7 @@ class CandidateSplits(object):
 		class_labels = attributes.get('class').get('options')
 		return homogenous_check(data, class_labels[0], class_labels[1]);
 
-	def no_info_gain(self): # incomplete
+	def no_info_gain(self): # (incomplete)
 		# if any candidate has any information gain, then this is false.
 		# this is true if not a single feature has info gain
 		return False
@@ -286,6 +270,8 @@ class CandidateSplits(object):
 			raise ValueError(msg)
 		else:
 			pass
+
+		# print 'split gain:' + str(info_gain)
 		return info_gain
 
 	def find_best_split(self, data, attributes):
@@ -300,7 +286,12 @@ class CandidateSplits(object):
 			gain = self.info_gain(data, nominal[split], attributes)
 			if gain > maxgain:
 				maxgain = gain
-				best_split = {'name':split, 'split':nominal[split], 'info_gain': gain}
+				# best_split dict
+				best_split = {
+					'name':split, 
+					'split':nominal[split], 
+					'info_gain': gain,
+					}
 			elif gain > 0 and gain == maxgain:
 				curr_feature = nominal[split]
 				prev_feature = best_split.get('split')
@@ -310,12 +301,18 @@ class CandidateSplits(object):
 			gain = self.info_gain(data, numeric[split], attributes)
 			if gain > maxgain:
 				maxgain = gain
-				best_split = {'name':split, 'split':nominal[split], 'info_gain': gain}
+				# best_split dict
+				best_split = {
+					'name':split, 
+					'split':nominal[split], 
+					'info_gain': gain,
+					}
 			elif gain > 0 and gain == maxgain:
 				curr_feature = numeric[split]
 				prev_feature = best_split.get('split')
 				best_split = info_tiebreaker(curr_feature, prev_feature, attributes)
 
+		# print 'max gain: ' +str(best_split)
 		return best_split
 
 	# EvaluateSplit(D, C, S)
@@ -434,3 +431,4 @@ def numeric_candidate_splits(data, feature, num_items):
 			right_branch.append(instance)
 
 	return NumericCandidateSplit(feature, left_branch, right_branch, threshold)
+
