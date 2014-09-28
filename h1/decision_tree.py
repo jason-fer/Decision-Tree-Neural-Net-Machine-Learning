@@ -174,13 +174,18 @@ class CandidateSplits(object):
 		return homogenous_check(data, class_labels[0], class_labels[1]);
 
 	def no_info_gain(self): # incomplete
-		# if any candidate has any information gain, this is false.
+		# if any candidate has any information gain, then this is false.
+		# this is true if not a single feature has info gain
 		return False
+
+	def get_entropy(self):
+		pass
 
 	def info_gain_nominal(self, data, split):
 		# determine the info gain in the current split
 		info_gain = -1
-
+		# choosing splits in ID3:
+		# select the split S that most reduces the conditional entropy of Y for training set D!
 		return info_gain
 
 	def info_gain_numeric(self, data, split):
@@ -237,6 +242,7 @@ class CandidateSplits(object):
 
 # (incomplete!!)  need to finish the tiebreaker feature
 def info_tiebreaker():
+	# Algo: if both are numeric, lowest value wins, otherwise, just use the attribute ordering!!!
 	raise ValueError('The tiebreaker function isn\'t written yet!')
 	# break tie btwn nominal features w/ order of attribute file
 	# the lowest index wins
