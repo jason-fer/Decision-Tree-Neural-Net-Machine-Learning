@@ -1,6 +1,7 @@
 import unittest, helpers, math
 
 homogenous_check = helpers.homogenous_check
+get_class_counts = helpers.get_class_counts
 
 # ***************** DECISION TREE NODE *****************
 class NumericNode(object):
@@ -92,6 +93,17 @@ class NumericCandidateSplit(object):
 		left, right = self.get_branches()
 		return [len(left), len(right)]
 
+	def get_num_instances(self):
+		branch_sizes = split.get_branch_sizes()
+		total_size = 0
+		for b in branch_sizes:
+			total_size += b
+
+		return total_size
+
+	def get_type(self):
+		return 'numeric split'
+
 # ***************** DECISION TREE NOMINAL SPLITS *****************
 class NominalCandidateSplit(object):
 	"""Candidate Split Decision Tree Structure"""
@@ -132,6 +144,17 @@ class NominalCandidateSplit(object):
 			sizes.append(len(instance))
 
 		return sizes
+
+	def get_num_instances(self):
+		branch_sizes = split.get_branch_sizes()
+		total_size = 0
+		for b in branch_sizes:
+			total_size += b
+
+		return total_size
+
+	def get_type(self):
+		return 'nominal split'
 
 # ***************** DECISION TREE CANDIATE (ALL) SPLITS *****************
 class CandidateSplits(object):
@@ -192,65 +215,77 @@ class CandidateSplits(object):
 		# this is true if not a single feature has info gain
 		return False
 
-	def get_entropy(self, split):
-		branch_sizes = split.get_branch_sizes()
-		total_size = 0
-		for b in branch_sizes:
-			total_size += b
+	def entropy_calc(self, data, nlabel, plabel):
+		total_size = len(data)
+		p_count, n_count = get_class_counts(data, nlabel, plabel)
+		# proportion 1
+		p1 = float(p_count) / total_size
+		# proportion 2
+		p2 = float(n_count) / total_size
+		# if entropy is greater than 1 or less than 0, we have an issue
+		entropy = - (p1 * math.log(p1, 2)) - (p2 * math.log(p2, 2))
 
-		# required, or the math wont work
-		total_size = float(total_size)
-		entropy = 0
-		# calculate total entropy 
-		for b in branch_sizes:
-			# prevent blowing up on zero values
-			if b <= 0: continue
-			# get proportion
-			p1 = b / total_size
-			entropy += - (p1 * math.log(p1, 2))
+		if entropy < 0 or entropy > 1:
+			raise ValueError('Entropy was: ' + str(entropy) + ' (impossible)')
+		else:
+			return entropy
 
-		return entropy
+	def get_entropy(self, data, split, attributes):
+		class_labels = attributes.get('class').get('options')
+		# the negative label is always first
+		nlabel = class_labels[0]
+		plabel = class_labels[1]
 
-	# def get_binary_entropy(self, split):
-	# 	# 2 class binary entropy
-	# 	# get a count for each feature within the data
-	# 	# entropy(S)= - p1 * log_2(p1) - p2 * log_2(p2)
-	# 	left_size, right_size = split.get_branch_sizes()
-	# 	total_size = left_size + right_size
-	# 	# proportion 1
-	# 	p1 = float(left_size) / total_size
-	# 	# proportion 2
-	# 	p2 = float(right_size) / total_size
+		# ********************  get parent entropy  ********************
+		parent_entropy = self.entropy_calc(data, nlabel, plabel)
+		parent_size = len(data)
 
-	# 	# # debug
-	# 	# print 'left_size: ' + str(left_size)
-	# 	# print 'right_size: ' + str(right_size)
-	# 	# print 'total size: ' + str(total_size)
-	# 	# print 'p1: ' + str(p1)
-	# 	# print 'p2: ' + str(p2)
+		# ********************  get children entropy  ********************
+		child_entropies = 0
+		branches = split.get_branches()
+		for b in branches:
+			if split.get_type() == 'nominal split':
+				instances = branches[b].get('instances')
+			else: # numeric split
+				instances = b
 
-	# 	entropy = - (p1 * math.log(p1, 2)) - (p2 * math.log(p2, 2))
+			# prevent divide by zero error
+			if len(instances) == 0: 
+				continue #do nothing if we have no data
+			else:
+				pass
 
-	# 	return entropy
+			child_entropy = self.entropy_calc(instances, nlabel, plabel)
 
-	def info_gain_nominal(self, data, split):
+			child_size = len(instances)
+			# sanity check
+			if child_size > parent_size:
+				msg = '[c:' + str(child_size) + ', p:' + str(parent_size) + '] '
+				raise ValueError(msg + 'child size > parent size (impossible)')
+			else:
+				pass
+			
+			# weight the new entropy by the size of the split
+			parnt_chld_ratio = float(child_size) / float(parent_size)
+			# update the sum of the weighted child entropies
+			child_entropies +=  parnt_chld_ratio * child_entropy
+
+		return parent_entropy, child_entropies
+
+	def info_gain(self, data, split, attributes):
 		# determine the info gain in the current split
-		info_gain = -1
-		entropy = self.get_entropy(split)
+		parent_entropy, children_entropy = self.get_entropy(data, split, attributes)
 
 		# split: Nominal( slope [up 90, flat 93, down 17] )
-		# choosing splits in ID3:
-		# select the split S that most reduces the conditional entropy of Y for training set D!
-		return info_gain
-
-	def info_gain_numeric(self, data, split):
-		# determine the info gain in the current split
-		info_gain = -1
 		# split: Numeric( trestbps <= 132.315 [115 85], REAL )
-		entropy = self.get_entropy(split)
-		# print 'entropy: ' + str(entropy)
-		# exit(0)
+		info_gain = parent_entropy - children_entropy
 
+		# sanity check
+		if info_gain < 0 or info_gain > 1:
+			msg = 'info gain was: ' + str(info_gain) + '... (impossible)!!!'
+			raise ValueError(msg)
+		else:
+			pass
 		return info_gain
 
 	def find_best_split(self, data, attributes):
@@ -262,7 +297,7 @@ class CandidateSplits(object):
 		best_split = None
 
 		for split in nominal:
-			gain = self.info_gain_nominal(data, nominal[split])
+			gain = self.info_gain(data, nominal[split], attributes)
 			if gain > maxgain:
 				maxgain = gain
 				best_split = {'name':split, 'split':nominal[split], 'info_gain': gain}
@@ -272,7 +307,7 @@ class CandidateSplits(object):
 				best_split = info_tiebreaker(curr_feature, prev_feature, attributes)
 
 		for split in numeric:
-			gain = self.info_gain_numeric(data, numeric[split])
+			gain = self.info_gain(data, numeric[split], attributes)
 			if gain > maxgain:
 				maxgain = gain
 				best_split = {'name':split, 'split':nominal[split], 'info_gain': gain}

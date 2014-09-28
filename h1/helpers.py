@@ -76,6 +76,22 @@ def homogenous_check(data, negative, positive):
 		# this should never happen
 		return False, None
 
+# call the same way as homogenous_check
+def get_class_counts(data, negative, positive):
+	# are all examples one type? (all pos / all neg)
+	positive_count = 0
+	negative_count = 0
+
+	for row in data:
+		if row[-1] == negative:
+			negative_count += 1
+		elif row[-1] == positive:
+			positive_count += 1
+		else:
+			pass
+
+	return positive_count, negative_count
+
 
 def load_data(path = None):
 	if not path:
