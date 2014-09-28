@@ -196,19 +196,27 @@ class CandidateSplits(object):
 		nominal = self.get_nominal_splits()
 		numeric = self.get_numeric_splits()
 		best_split = None
-		
+
 		for split in nominal:
 			print nominal[split]
 			gain = self.info_gain_nominal(data, nominal[split])
 			if gain > maxgain:
 				maxgain = gain
-				best_split = {'name':split, 'split':nominal[split]}
+				best_split = {'name':split, 'split':nominal[split], 'info_gain': gain}
+			elif gain == maxgain:
+				# break tie btwn nominal features w/ order of attribute file
+				# the lowest index wins
+				pass
 
 		for split in numeric:
 			gain = self.info_gain_numeric(data, numeric[split])
 			if gain > maxgain:
 				maxgain = gain
-				best_split = {'name':split, 'split':nominal[split]}
+				best_split = {'name':split, 'split':nominal[split], 'info_gain': gain}
+			elif gain == maxgain:
+				# break tie btwn numeric features w/ smaller attribute
+				# the lower value wins
+				pass				
 
 		 return best_split
 
