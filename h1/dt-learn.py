@@ -13,119 +13,52 @@ DecisionTree = decision_tree.DecisionTree
 CandidateSplits = decision_tree.CandidateSplits
 NumericCandidateSplit = decision_tree.NumericCandidateSplit
 NominalCandidateSplit = decision_tree.NominalCandidateSplit
+determine_candidate_splits = decision_tree.determine_candidate_splits
 Node = decision_tree.Node
 
-def determine_candidate_splits(data, attributes):
-	"""Determine all possible candidate splits"""
-	num_items = len(data)
-
-	numeric = {}
-	nominal = {}
-
-	for attr in attributes:
-		feature = attributes.get(attr)
-
-		if feature.get('type') == 'numeric':
-			numeric[attr] = numeric_candidate_splits(data, feature, num_items)
-		elif feature.get('type') == 'nominal':
-			nominal[attr] = nominal_candidate_splits(data, feature, num_items)
-			pass
-		else:
-			# the class variable
-			pass
-
-	# delete all splits that have no instances (incomplete)
-	# clean splits!!!!!!!!!!!!
-	# dump_splits(splits) # debug
-	return CandidateSplits(numeric, nominal)
-
-
-def nominal_candidate_splits(data, feature, num_items):
-	"""splits on nominal features have one branch per value"""
-	index = feature.get('index')
-	branches = {}
-
-	count = 0
-	# one branch per option in the feature vector
-	# order must match the attribute order in ARFF file
-	for branch_name in feature.get('options'):
-		# the branch_name is the option name
-		branches[branch_name] = {
-			'option':branch_name, 
-			'index':count, # tells us the order from the ARFF file
-			'instances':[] 
-			}
-		count = count + 1
-
-	# match each instance with the right respective branch
-	for instance in data:
-		branch_name = instance[index]
-		branches[branch_name].get('instances').append(instance)
-
-	return NominalCandidateSplit(feature, branches)
-
-
-def numeric_candidate_splits(data, feature, num_items):
-	"""splits on numeric features use a threshold"""
-	"""sort data by feature value asc"""
-	index = feature.get('index')
-	sorted_data = sorted(data, key=lambda x: x[index])
-	grand_total = sum(row[index] for row in sorted_data)
-
-	# initialize our branches & threshold (midpoint)
-	threshold = grand_total / num_items; #is my midpoint incorrect? (incomplete??)
-	left_branch = []
-	right_branch = []
-
-	# split the data-sets based on the threshold (midpoint)
-	for instance in data:
-		if instance[index] < threshold:
-			left_branch.append(instance)
-		else:
-			right_branch.append(instance)
-
-	return NumericCandidateSplit(feature, left_branch, right_branch, threshold)
-
-def stopping_criteria_is_met(candidates):
-	# The stopping criteria (for making a node into a leaf) are that (i) all of the training instances reaching the node belong to the same class, or (ii) there are fewer than m training instances reaching the node, where m is provided as input to the program, or (iii) no feature has positive information gain, or (iv) there are no more remaining candidate splits at the node.
+def stopping_criteria_is_met(candidates, data, m, attributes):
 	# stop if:
+	candidate_count = len(data)
 	# 1. candidates all have the same class
-	# 2. candidates is empty
-	if candidates == {}:
+	if candidates.is_homogenous(data, attributes):
+		return True
+	# 2. there are fewer than m training instances reaching the node
+	# 4. or candidates is empty
+	elif candidate_count == 0 or candidate_count < m:
+		return True
+	# 3. no feature has positive information gain (incomplete)
+	elif candidates.no_info_gain():
 		return True
 	else:
-		pass
-
-	for instance in candidates:
-		print candidates
-		# if these all have the same class, return True
-
-	return False
+		# Stopping criterian wasn't met
+		return False
 
 def data_subset(data, outcome):
 	# list each piece of data in the subset that matches the outcome
 	pass
 	# return subset_of_data
 
-def make_subtree(data, attributes):
- candidates = determine_candidate_splits(data, attributes)
+def make_subtree(data, attributes, m):
+	candidates = determine_candidate_splits(data, attributes)
 
- # candidates.test_split_counts(data) #debug
- # if stopping_criteria_is_met(candidates):
- #   # determine class label/probabilities for N
- #   # use that to build the leaf node
- #   node = Node('attribute', 'value')
- # else:
- #   # make an internal node N
- #   node = Node('attribute', 'value')
- #   splits = find_best_split(data, candidates) 
- #   # for each outcome k of splits
- #   for outcome in splits:
- #     # subset_of_data = subset of instances that have outcome k
- #     subset_of_data = data_subset(data, outcome)
- #     # kth child of N = make_subtree(Dk) 
- #     node.children.add = make_subtree(Dk) 
- # return node
+	# candidates.test_split_counts(data) #debug
+	if stopping_criteria_is_met(candidates, data, m, attributes):
+	#   # determine class label/probabilities for N
+	#   # use that to build the leaf node
+	#   node = Node('attribute', 'value')
+		pass
+	else:
+	#   # make an internal node N
+	#   node = Node('attribute', 'value')
+	#   splits = find_best_split(data, candidates) 
+	#   # for each outcome k of splits
+	#   for outcome in splits:
+	#     # subset_of_data = subset of instances that have outcome k
+	#     subset_of_data = data_subset(data, outcome)
+	#     # kth child of N = make_subtree(Dk) 
+	#     node.children.add = make_subtree(Dk) 
+	# return node
+		pass
 
 
 # Splits should be chosen using information gain. If there is a tie between two features in their information gain, you should break the tie in favor of the feature listed first in the header section of the ARFF file. If there is a tie between two different thresholds for a numeric feature, you should break the tie in favor of the smaller threshold.
@@ -162,6 +95,8 @@ def main(args):
 	"""where m is the number of training instances; used in stopping criteria"""
 	"""usage python dt-learn.py $1 $2 $3"""
 
+	# stopping criteria m
+	m = 20
 	# init
 	# arff_file = load_data('examples/diabetes_train.arff')
 	arff_file = load_data('examples/heart_train.arff')
@@ -182,7 +117,7 @@ def main(args):
 	# ?? dtree.root = Node('class', result)
 
 	# Top-down decision tree build (incomplete)
-	dtree.root = make_subtree(data, attributes)
+	dtree.root = make_subtree(data, attributes, m)
 
 	# Output results (incomplete)
 
