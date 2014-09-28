@@ -90,7 +90,7 @@ class NumericCandidateSplit(object):
 
 	def get_branch_sizes(self):
 		left, right = self.get_branches()
-		return len(left), len(right)
+		return [len(left), len(right)]
 
 # ***************** DECISION TREE NOMINAL SPLITS *****************
 class NominalCandidateSplit(object):
@@ -122,6 +122,16 @@ class NominalCandidateSplit(object):
 
 	def get_branches(self):
 		return self.branches
+
+	def get_branch_sizes(self):
+		branches = self.get_branches()
+		sizes = []
+
+		for b in branches:
+			instance = branches[b].get('instances')
+			sizes.append(len(instance))
+
+		return sizes
 
 # ***************** DECISION TREE CANDIATE (ALL) SPLITS *****************
 class CandidateSplits(object):
@@ -182,31 +192,52 @@ class CandidateSplits(object):
 		# this is true if not a single feature has info gain
 		return False
 
-	def get_binary_entropy(self, split):
-		# 2 class binary entropy
-		# get a count for each feature within the data
-		# entropy(S)= - p1 * log_2(p1) - p2 * log_2(p2)
-		left_size, right_size = split.get_branch_sizes()
-		total_size = left_size + right_size
-		# proportion 1
-		p1 = float(left_size) / total_size
-		# proportion 2
-		p2 = float(right_size) / total_size
+	def get_entropy(self, split):
+		branch_sizes = split.get_branch_sizes()
+		total_size = 0
+		for b in branch_sizes:
+			total_size += b
 
-		# # debug
-		# print 'left_size: ' + str(left_size)
-		# print 'right_size: ' + str(right_size)
-		# print 'total size: ' + str(total_size)
-		# print 'p1: ' + str(p1)
-		# print 'p2: ' + str(p2)
+		# required, or the math wont work
+		total_size = float(total_size)
+		entropy = 0
+		# calculate total entropy 
+		for b in branch_sizes:
+			# prevent blowing up on zero values
+			if b <= 0: continue
+			# get proportion
+			p1 = b / total_size
+			entropy += - (p1 * math.log(p1, 2))
 
-		entropy = - (p1 * math.log(p1, 2)) - (p2 * math.log(p2, 2))
-		
 		return entropy
+
+	# def get_binary_entropy(self, split):
+	# 	# 2 class binary entropy
+	# 	# get a count for each feature within the data
+	# 	# entropy(S)= - p1 * log_2(p1) - p2 * log_2(p2)
+	# 	left_size, right_size = split.get_branch_sizes()
+	# 	total_size = left_size + right_size
+	# 	# proportion 1
+	# 	p1 = float(left_size) / total_size
+	# 	# proportion 2
+	# 	p2 = float(right_size) / total_size
+
+	# 	# # debug
+	# 	# print 'left_size: ' + str(left_size)
+	# 	# print 'right_size: ' + str(right_size)
+	# 	# print 'total size: ' + str(total_size)
+	# 	# print 'p1: ' + str(p1)
+	# 	# print 'p2: ' + str(p2)
+
+	# 	entropy = - (p1 * math.log(p1, 2)) - (p2 * math.log(p2, 2))
+
+	# 	return entropy
 
 	def info_gain_nominal(self, data, split):
 		# determine the info gain in the current split
 		info_gain = -1
+		entropy = self.get_entropy(split)
+
 		# split: Nominal( slope [up 90, flat 93, down 17] )
 		# choosing splits in ID3:
 		# select the split S that most reduces the conditional entropy of Y for training set D!
@@ -216,9 +247,9 @@ class CandidateSplits(object):
 		# determine the info gain in the current split
 		info_gain = -1
 		# split: Numeric( trestbps <= 132.315 [115 85], REAL )
-		entropy = self.get_binary_entropy(split)
-		print 'entropy: ' + str(entropy)
-		exit(0)
+		entropy = self.get_entropy(split)
+		# print 'entropy: ' + str(entropy)
+		# exit(0)
 
 		return info_gain
 
