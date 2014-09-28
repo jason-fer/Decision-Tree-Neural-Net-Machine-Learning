@@ -3,26 +3,65 @@ import unittest, helpers
 homogenous_check = helpers.homogenous_check
 
 # ***************** DECISION TREE NODE *****************
-class Node(object):
-		"""Numeric, Nominal, or Class decision tree node (with a list of results)"""
-		def __init__(self, name, attribute, value):
-			self.name = name
-			self.attribute = attribute
-			self.value = value
-			self.children = {}
+class NumericNode(object):
+	"""Numeric, Nominal, or Class decision tree node (with a list of results)"""
+	def __init__(self, name, attribute, value, neg_count, pos_count):
+		self.name = name
+		self.attribute = attribute
+		self.value = value
+		# number of negative classes with this attribute
+		self.neg_count = neg_count
+		# number of positive classes with this attribute
+		self.pos_count = pos_count
+		self.children = []
 
-		def is_leaf(self):
-			self.children == {}
+	# def __repr__(self):
+	# 	# thal = fixed_defect [4 6]
+	# 	# nominal: attr = value [neg pos]
+	# 	# numeric: attr <= value [neg pos]
+	# 	obj_string = ''
+
+	def get_type(self):
+		return 'nominal'
+
+	def is_leaf(self):
+		return self.children == []
+
+class NominalNode(object):
+	"""Numeric, Nominal, or Class decision tree node (with a list of results)"""
+	def __init__(self, name, attribute, value, neg_count, pos_count):
+		self.name = name
+		self.attribute = attribute
+		self.value = value
+		# number of negative classes with this attribute
+		self.neg_count = neg_count
+		# number of positive classes with this attribute
+		self.pos_count = pos_count
+		self.left_child = {}
+		self.right_child = {}
+
+	# def __repr__(self):
+	# 	# thal = fixed_defect [4 6]
+	# 	# nominal: attr = value [neg pos]
+	# 	# numeric: attr <= value [neg pos]
+	# 	obj_string = ''
+
+	def get_type(self):
+		return 'numeric'
+
+	def is_leaf(self):
+		return self.left_child == {} and self.right_child == {}
+		
 
 # ******************** DECISION TREE ********************
 class DecisionTree(object):
-		"""Machine Learning Decision Tree Structure"""
-		def __init__(self):
-			self.root = None
+	"""Machine Learning Decision Tree Structure"""
+	def __init__(self):
+		self.root = None
 
-		def printTree(self):
-			# print the Decision Tree
-			pass
+	def printTree(self):
+		# print the Decision Tree
+		pass
 
 # ***************** DECISION TREE NUMERIC SPLITS *****************
 class NumericCandidateSplit(object):

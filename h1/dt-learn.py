@@ -14,7 +14,8 @@ CandidateSplits = decision_tree.CandidateSplits
 NumericCandidateSplit = decision_tree.NumericCandidateSplit
 NominalCandidateSplit = decision_tree.NominalCandidateSplit
 determine_candidate_splits = decision_tree.determine_candidate_splits
-Node = decision_tree.Node
+NumericNode = decision_tree.NumericNode
+NominalNode = decision_tree.NominalNode
 
 def stopping_criteria_is_met(candidates, data, m, attributes):
 	# stop if:
@@ -47,30 +48,30 @@ def make_subtree(data, attributes, m):
 
 	# candidates.test_split_counts(data) #debug
 	stop_now, reason = stopping_criteria_is_met(candidates, data, m, attributes)
-	if stop_now:
+	if stop_now: # leaf-node
 	#   # determine class label/probabilities for N
-	#   # use that to build the leaf node
-	#   node = Node('attribute', 'value')
+	  # node = Node('attribute', 'value')
 		pass
 	else:
-	#   # make an internal node N
-	#   node = Node('attribute', 'value')
-	#   splits = find_best_split(data, candidates) 
-	#   # for each outcome k of splits
-	#   for outcome in splits:
-	#     # subset_of_data = subset of instances that have outcome k
-	#     subset_of_data = data_subset(data, outcome)
-	#     # kth child of N = make_subtree(Dk) 
-	#     node.children.add = make_subtree(Dk) 
-	# return node
-		pass
+	  # make an internal node N
+	  print 'hi'
+	  exit(0)
+	  split = find_best_split(data, candidates)
+	  print split
+		#   node = Node('attribute', 'value')
+		#   # for each outcome k of splits
+		#   for outcome in splits:
+		#     # subset_of_data = subset of instances that have outcome k
+		#     subset_of_data = data_subset(data, outcome)
+		#     # kth child of N = make_subtree(Dk) 
+		#     node.children.add = make_subtree(Dk) 
+		# return node
 
 
 # Splits should be chosen using information gain. If there is a tie between two features in their information gain, you should break the tie in favor of the feature listed first in the header section of the ARFF file. If there is a tie between two different thresholds for a numeric feature, you should break the tie in favor of the smaller threshold.
 #  OrdinaryFindBestSplit(set of training instances D, set of candidate splits C) 
 def find_best_split(data, candidates):
-	pass
-	#  maxgain = negative infinity
+	maxgain = -1
 	#  for each split S in C
 	#    gain = InfoGain(D, S) 
 	#    if gain > maxgain
@@ -111,12 +112,12 @@ def main(args):
 
 	# homogenous check (incomplete)
 	dtree = DecisionTree()
-	is_homogenous, result = homogenous_check(data, class_labels[0], class_labels[1]);
-	if result != None:
-		# need to produce a single node tree
-		dtree.root = Node('class', result)
-	else:
-		pass
+	# is_homogenous, result = homogenous_check(data, class_labels[0], class_labels[1]);
+	# if result != None:
+	# 	# need to produce a single node tree
+	# 	dtree.root = Node('class', result)
+	# else:
+	# 	pass
 
 	# check to see if predicting attributes are empty (incomplete)
 	# ?? dtree.root = Node('class', result)
