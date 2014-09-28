@@ -54,7 +54,7 @@ def make_subtree(data, attributes, m):
 		pass
 	else:
 	  # make an internal node N
-	  split = candidates.find_best_split(data)
+	  split = candidates.find_best_split(data, attributes)
 	  exit(0)
 	  print split
 		#   node = Node('attribute', 'value')

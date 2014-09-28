@@ -177,7 +177,7 @@ class CandidateSplits(object):
 		# if any candidate has any information gain, this is false.
 		return False
 
-	def info_gain_nominal(self, split):
+	def info_gain_nominal(self, data, split):
 		# determine the info gain in the current split
 		info_gain = -1
 
@@ -189,7 +189,7 @@ class CandidateSplits(object):
 
 		return info_gain
 
-	def find_best_split(self, data):
+	def find_best_split(self, data, attributes):
 		# Splits should be chosen using information gain. If there is a tie between two features in their information gain, you should break the tie in favor of the feature listed first in the header section of the ARFF file. If there is a tie between two different thresholds for a numeric feature, you should break the tie in favor of the smaller threshold.
 		#  OrdinaryFindBestSplit(set of training instances D, set of candidate splits C) 
 		maxgain = -1
@@ -198,27 +198,26 @@ class CandidateSplits(object):
 		best_split = None
 
 		for split in nominal:
-			print nominal[split]
 			gain = self.info_gain_nominal(data, nominal[split])
 			if gain > maxgain:
 				maxgain = gain
 				best_split = {'name':split, 'split':nominal[split], 'info_gain': gain}
-			elif gain == maxgain:
-				# break tie btwn nominal features w/ order of attribute file
-				# the lowest index wins
-				pass
+			elif gain > 0 and gain == maxgain:
+				curr_feature = nominal[split]
+				prev_feature = best_split.get('split')
+				best_split = info_tiebreaker(curr_feature, prev_feature, attributes)
 
 		for split in numeric:
 			gain = self.info_gain_numeric(data, numeric[split])
 			if gain > maxgain:
 				maxgain = gain
 				best_split = {'name':split, 'split':nominal[split], 'info_gain': gain}
-			elif gain == maxgain:
-				# break tie btwn numeric features w/ smaller attribute
-				# the lower value wins
-				pass				
+			elif gain > 0 and gain == maxgain:
+				curr_feature = numeric[split]
+				prev_feature = best_split.get('split')
+				best_split = info_tiebreaker(curr_feature, prev_feature, attributes)
 
-		 return best_split
+		return best_split
 
 	# EvaluateSplit(D, C, S)
 	def evaluate_split(data, candidates, subset):
@@ -235,6 +234,36 @@ class CandidateSplits(object):
 		#    return HD(Y) - HD(Y | S,S1,S2)
 
 # ***************** CANDIDATE SPLITS HELPER METHODS *****************
+
+# (incomplete!!)  need to finish the tiebreaker feature
+def info_tiebreaker():
+	raise ValueError('The tiebreaker function isn\'t written yet!')
+	# break tie btwn nominal features w/ order of attribute file
+	# the lowest index wins
+	prev_index = get_feature_index(feature, attributes)
+	curr_index = get_feature_index(feature, attributes)
+
+	# break tie btwn numeric features w/ smaller attribute
+	# the lower value wins
+	prev_value = get_feature_value(feature)
+	curr_value = get_feature_value(feature)
+
+	# w/ nominal vs numeric features, nominal wins (ask professor!!!!!!!!!!!!!!!)
+	pass
+	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+def get_feature_index(feature, attributes):
+	raise ValueError('The get_feature_index function isn\'t written yet!')
+	index = 0
+	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	return index
+
+def get_feature_value(feature):
+	raise ValueError('The get_feature_value function isn\'t written yet!')
+	value = 0
+	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	return value
+
 def determine_candidate_splits(data, attributes):
 	"""Determine all possible candidate splits"""
 	num_items = len(data)
