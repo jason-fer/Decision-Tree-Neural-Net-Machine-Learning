@@ -616,20 +616,20 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 			# print 'gain: %s from midpoint %s' % (gain, m)
 
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	the_name = feature.get('name')
-	# # exit(0)
-	if the_name == 'thalach' and len(data) == 103:
-		# if threshold == 111.0:
-		for m in midpoints:
-			print m
+	# the_name = feature.get('name')
+	# # # exit(0)
+	# if the_name == 'thalach' and len(data) == 103:
+	# 	# if threshold == 111.0:
+	# 	for m in midpoints:
+	# 		print m
 
-		print 'threshold'
-		print threshold
-		# else:
-		# pass
-		exit(0)
-	else:
-		pass
+	# 	print 'threshold'
+	# 	print threshold
+	# 	# else:
+	# 	# pass
+	# 	exit(0)
+	# else:
+	# 	pass
 
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 

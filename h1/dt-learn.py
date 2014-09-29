@@ -184,7 +184,7 @@ def main(args):
 	"""usage python dt-learn.py $1 $2 $3"""
 
 	# stopping criteria m
-	m = 4
+	m = 20
 	# init
 	# arff_file = load_data('examples/diabetes_train.arff')
 	arff_file = load_data('examples/heart_train.arff')
