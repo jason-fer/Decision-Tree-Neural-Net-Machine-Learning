@@ -116,7 +116,7 @@ def generate_nodes(data, split, attributes):
 
 			if len(right) != 0:
 				t = split.get_thresh_def()
-				numeric_node = NumericNode(feature, value, info_gain, left, lp, ln, t)
+				numeric_node = NumericNode(feature, value, info_gain, right, rp, rn, t)
 				nodes.append(numeric_node)
 			else:
 				pass

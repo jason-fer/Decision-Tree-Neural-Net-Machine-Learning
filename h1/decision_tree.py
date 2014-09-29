@@ -153,10 +153,10 @@ class NumericNode(Node):
 		# are negative values left or right of threshold?
 		# are positive values left or right of threshold?
 		thresh_def = self.get_thresh_def()
-		if thresh_def == {}:
-			raise ValueError('thresh_def not found!!')
-		else:
-			pass
+		# if thresh_def == {}:
+		# 	raise ValueError('thresh_def not found!!')
+		# else:
+		# 	pass
 
 		# thresh_def {'neg_point':None, 'pos_point':None, 'threshold':None}
 		neg_point = thresh_def.get('neg_point')
@@ -172,14 +172,14 @@ class NumericNode(Node):
 		if self.pos_count > self.neg_count:
 			obj_string = '%s %s %.6f' % (self.feature, pos_sign, value)
 			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
-			if self.is_leaf():
+			if self.is_leaf() == True:
 				obj_string += ': positive'
 			else:
 				pass
 		elif self.pos_count <= self.neg_count:
 			obj_string = '%s %s %.6f' % (self.feature, neg_sign, value)
 			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
-			if self.is_leaf():
+			if self.is_leaf() == True:
 				obj_string += ': negative'
 			else:
 				pass
@@ -187,7 +187,7 @@ class NumericNode(Node):
 			# negative wins?
 			obj_string = '%s = %.6f' % (self.feature, value)
 			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
-			if self.is_leaf():
+			if self.is_leaf() == True:
 				obj_string += ': negative'
 			else:
 				pass
