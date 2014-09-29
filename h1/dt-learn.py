@@ -68,7 +68,6 @@ def nominal_data_split(data, feature_info, value, attributes):
 	else:
 		return subset, p_count, n_count
 
-
 def generate_nodes(data, split, attributes):
 	# use the data to generate a node for best split
 	# name, attribute, value, neg_count, pos_count, data
@@ -119,8 +118,7 @@ def make_subtree(data, attributes, m):
 	stop_now, reason = stopping_criteria_is_met(candidates, data, m, attributes)
 	if stop_now: # leaf-node
 		return []
-		# print 'reason!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-		# print reason
+		# does this make any difference?
 		# raise ValueError('stopping function not written')
 		# determine class label/probabilities for N
 		# node = Node('attribute', 'value') ?
