@@ -206,8 +206,19 @@ class CandidateSplits(object):
 		p1 = float(p_count) / total_size
 		# proportion 2
 		p2 = float(n_count) / total_size
+
+		if p1 != 0:
+			proportion1 = - (p1 * math.log(p1, 2))
+		else:
+			proportion1 = 0
+
+		if p2 != 0:
+			proportion2 = - (p2 * math.log(p2, 2))
+		else:
+			proportion2 = 0
+
 		# if entropy is greater than 1 or less than 0, we have an issue
-		entropy = - (p1 * math.log(p1, 2)) - (p2 * math.log(p2, 2))
+		entropy = proportion1 + proportion2
 
 		if entropy < 0 or entropy > 1:
 			raise ValueError('Entropy was: ' + str(entropy) + ' (impossible)')

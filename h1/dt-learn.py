@@ -69,8 +69,8 @@ def generate_nodes(data, split, attributes):
 	feature = split.get('name') # name of attribute
 	feature_options = attributes.get(feature).get('options')
 	feature_info = attributes.get(feature)
-
-	print split
+	info_gain = split.get('split')
+	# get the internal split class (inside the current dict)
 	split = split.get('split')
 	split_type = split.get_type()
 
@@ -80,7 +80,7 @@ def generate_nodes(data, split, attributes):
 			# nothing to do if there's nothing in the subset
 			if len(subset) != 0:
 				print 'nominal node created! :' + str(value) + ', size: ' + str(len(subset))
-				nodes.append(NominalNode(feature, value, info_gain, data, p, n))
+				nodes.append(NominalNode(feature, value, info_gain, subset, p, n))
 			else:
 				pass
 	else: # 'numeric split' decision_tree.NumericCandidateSplit
@@ -88,7 +88,7 @@ def generate_nodes(data, split, attributes):
 			# nothing to do if there's nothing in the subset
 			if len(subset) != 0:
 				print 'numeric node created! :' + str(value) + ', size: ' + str(len(subset))
-				nodes.append(NumericNode(feature, value, info_gain, data, p, n))
+				nodes.append(NumericNode(feature, value, info_gain, subset, p, n))
 			else:
 				pass
 
@@ -105,14 +105,17 @@ def make_subtree(data, attributes, m):
 		# print 'reason!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 		# print reason
 		# raise ValueError('stopping function not written')
-	  # determine class label/probabilities for N
-	  # node = Node('attribute', 'value') ?
+		# determine class label/probabilities for N
+		# node = Node('attribute', 'value') ?
 		pass
 	else:
-	  split = candidates.find_best_split(data, attributes)
-	  nodes = generate_nodes(data, split, attributes)
-	  for n in nodes:
-			n.children.append(make_subtree(n.data, attributes, m))
+		split = candidates.find_best_split(data, attributes)
+		nodes = generate_nodes(data, split, attributes)
+		for n in nodes:
+			# find the children for each node, & set m = m - 1 (to terminate)
+			print 'len(n.data)'
+			print len(n.data)
+			n.children = make_subtree(n.data, attributes, m - 1)
 
 	return nodes
 
@@ -123,7 +126,7 @@ def main(args):
 	"""usage python dt-learn.py $1 $2 $3"""
 
 	# stopping criteria m
-	m = 20
+	m = 4
 	# init
 	# arff_file = load_data('examples/diabetes_train.arff')
 	arff_file = load_data('examples/heart_train.arff')
