@@ -1,7 +1,95 @@
 import unittest, helpers, math
+from collections import Counter
 
 homogenous_check = helpers.homogenous_check
 get_class_counts = helpers.get_class_counts
+
+# ***************** Entropy / InfoGain *****************
+def entropy_calc(data, nlabel, plabel):
+	total_size = len(data)
+	p_count, n_count = get_class_counts(data, nlabel, plabel)
+	# proportion 1
+	p1 = float(p_count) / total_size
+	# proportion 2
+	p2 = float(n_count) / total_size
+
+	if p1 != 0:
+		proportion1 = - (p1 * math.log(p1, 2))
+	else:
+		proportion1 = 0
+
+	if p2 != 0:
+		proportion2 = - (p2 * math.log(p2, 2))
+	else:
+		proportion2 = 0
+
+	# if entropy is greater than 1 or less than 0, we have an issue
+	entropy = proportion1 + proportion2
+
+	if entropy < 0 or entropy > 1:
+		raise ValueError('Entropy was: ' + str(entropy) + ' (impossible)')
+	else:
+		return entropy
+
+def get_entropy(data, split, attributes):
+	class_labels = attributes.get('class').get('options')
+	# the negative label is always first
+	nlabel = class_labels[0]
+	plabel = class_labels[1]
+
+	# ********************  get parent entropy  ********************
+	parent_entropy = entropy_calc(data, nlabel, plabel)
+	parent_size = len(data)
+
+	# ********************  get children entropy  ********************
+	child_entropies = 0
+	branches = split.get_branches()
+	for b in branches:
+		if split.get_type() == 'nominal split':
+			instances = branches[b].get('instances')
+		else: # numeric split
+			instances = b
+
+		# prevent divide by zero error
+		if len(instances) == 0: 
+			continue #do nothing if we have no data
+		else:
+			pass
+
+		child_entropy = entropy_calc(instances, nlabel, plabel)
+
+		child_size = len(instances)
+		# sanity check
+		if child_size > parent_size:
+			msg = '[c:' + str(child_size) + ', p:' + str(parent_size) + '] '
+			raise ValueError(msg + 'child size > parent size (impossible)')
+		else:
+			pass
+		
+		# weight the new entropy by the size of the split
+		parnt_chld_ratio = float(child_size) / float(parent_size)
+		# update the sum of the weighted child entropies
+		child_entropies +=  parnt_chld_ratio * child_entropy
+
+	return parent_entropy, child_entropies
+
+def info_gain(data, split, attributes):
+	# determine the info gain in the current split
+	parent_entropy, children_entropy = get_entropy(data, split, attributes)
+
+	# split: Nominal( slope [up 90, flat 93, down 17] )
+	# split: Numeric( trestbps <= 132.315 [115 85], REAL )
+	info_gain = parent_entropy - children_entropy
+
+	# sanity check
+	if info_gain < 0 or info_gain > 1:
+		msg = 'info gain was: ' + str(info_gain) + '... (impossible)!!!'
+		raise ValueError(msg)
+	else:
+		pass
+
+	# print 'split gain:' + str(info_gain)
+	return info_gain
 
 # ***************** DECISION TREE NODE *****************
 class Node(object):
@@ -83,10 +171,13 @@ class NumericCandidateSplit(object):
 		return obj_string
 
 	def get_branches(self):
+		return [self.left_branch, self.right_branch]
+
+	def get_l_r_branches():
 		return self.left_branch, self.right_branch
 
 	def get_branch_sizes(self):
-		left, right = self.get_branches()
+		left, right = self.get_l_r_branches()
 		return [len(left), len(right)]
 
 	def get_num_instances(self):
@@ -183,7 +274,7 @@ class CandidateSplits(object):
 		# check numeric
 		numeric = self.numeric_candidates
 		for n in numeric:
-			left_branch, right_branch = numeric[n].get_branches()
+			left_branch, right_branch = numeric[n].get_l_r_branches()
 
 			instance_count = 0
 			instance_count += len(left_branch)
@@ -207,95 +298,10 @@ class CandidateSplits(object):
 		return homogenous_check(data, class_labels[0], class_labels[1]);
 
 	def no_info_gain(self): # (incomplete)
+		# raise ValueError('this function isn not written') xxxxxxxxxxxxxxxxxxxxxxxx
 		# if any candidate has any information gain, then this is false.
 		# this is true if not a single feature has info gain
 		return False
-
-	def entropy_calc(self, data, nlabel, plabel):
-		total_size = len(data)
-		p_count, n_count = get_class_counts(data, nlabel, plabel)
-		# proportion 1
-		p1 = float(p_count) / total_size
-		# proportion 2
-		p2 = float(n_count) / total_size
-
-		if p1 != 0:
-			proportion1 = - (p1 * math.log(p1, 2))
-		else:
-			proportion1 = 0
-
-		if p2 != 0:
-			proportion2 = - (p2 * math.log(p2, 2))
-		else:
-			proportion2 = 0
-
-		# if entropy is greater than 1 or less than 0, we have an issue
-		entropy = proportion1 + proportion2
-
-		if entropy < 0 or entropy > 1:
-			raise ValueError('Entropy was: ' + str(entropy) + ' (impossible)')
-		else:
-			return entropy
-
-	def get_entropy(self, data, split, attributes):
-		class_labels = attributes.get('class').get('options')
-		# the negative label is always first
-		nlabel = class_labels[0]
-		plabel = class_labels[1]
-
-		# ********************  get parent entropy  ********************
-		parent_entropy = self.entropy_calc(data, nlabel, plabel)
-		parent_size = len(data)
-
-		# ********************  get children entropy  ********************
-		child_entropies = 0
-		branches = split.get_branches()
-		for b in branches:
-			if split.get_type() == 'nominal split':
-				instances = branches[b].get('instances')
-			else: # numeric split
-				instances = b
-
-			# prevent divide by zero error
-			if len(instances) == 0: 
-				continue #do nothing if we have no data
-			else:
-				pass
-
-			child_entropy = self.entropy_calc(instances, nlabel, plabel)
-
-			child_size = len(instances)
-			# sanity check
-			if child_size > parent_size:
-				msg = '[c:' + str(child_size) + ', p:' + str(parent_size) + '] '
-				raise ValueError(msg + 'child size > parent size (impossible)')
-			else:
-				pass
-			
-			# weight the new entropy by the size of the split
-			parnt_chld_ratio = float(child_size) / float(parent_size)
-			# update the sum of the weighted child entropies
-			child_entropies +=  parnt_chld_ratio * child_entropy
-
-		return parent_entropy, child_entropies
-
-	def info_gain(self, data, split, attributes):
-		# determine the info gain in the current split
-		parent_entropy, children_entropy = self.get_entropy(data, split, attributes)
-
-		# split: Nominal( slope [up 90, flat 93, down 17] )
-		# split: Numeric( trestbps <= 132.315 [115 85], REAL )
-		info_gain = parent_entropy - children_entropy
-
-		# sanity check
-		if info_gain < 0 or info_gain > 1:
-			msg = 'info gain was: ' + str(info_gain) + '... (impossible)!!!'
-			raise ValueError(msg)
-		else:
-			pass
-
-		# print 'split gain:' + str(info_gain)
-		return info_gain
 
 	def find_best_split(self, data, attributes):
 		maxgain = -1
@@ -304,7 +310,7 @@ class CandidateSplits(object):
 		best_split = None
 
 		for split in nominal:
-			gain = self.info_gain(data, nominal[split], attributes)
+			gain = info_gain(data, nominal[split], attributes)
 
 			if gain > maxgain:
 				maxgain = gain
@@ -316,7 +322,7 @@ class CandidateSplits(object):
 				best_split = info_tiebreaker(curr_feature, prev_feature, gain)
 
 		for split in numeric:
-			gain = self.info_gain(data, numeric[split], attributes)
+			gain = info_gain(data, numeric[split], attributes)
 
 			if gain > maxgain:
 				maxgain = gain
@@ -332,7 +338,6 @@ class CandidateSplits(object):
 
 # ***************** CANDIDATE SPLITS HELPER METHODS *****************
 
-# (incomplete!!)  need to finish the tiebreaker feature
 def info_tiebreaker(curr_feature, prev_feature, gain):
 	curr_type = curr_feature.get_type()
 	prev_type = prev_feature.get_type()
@@ -417,6 +422,7 @@ def nominal_candidate_splits(data, feature, num_items):
 			}
 		count = count + 1
 
+
 	# match each instance with the right respective branch
 	for instance in data:
 		branch_name = instance[index]
@@ -424,7 +430,45 @@ def nominal_candidate_splits(data, feature, num_items):
 
 	return NominalCandidateSplit(feature, branches)
 
+def make_list_unique(sorted_list):
+    seen = set()
+    seen_add = seen.add
+    return [ x for x in sorted_list if not (x in seen or seen_add(x))]
 
+def get_possible_midpoints(neg_points, pos_points):
+	"""identify adjacent examples that differ in their target class"""
+	"""choose thresholds with maximum information gain"""
+	# a threshold must be a midpoint between a positive & negative instance
+	# step 1 get all unique values for pos / neg
+	# step 2, get all unique midpoints between the unique values
+	# step 3, find the midpoint with maximum information gain
+	
+	neg_uniques = make_list_unique(neg_points)
+	pos_uniques = make_list_unique(pos_points)
+
+	midpoints = []
+	for i in neg_uniques:
+		for j in pos_uniques:
+			midpoints.append( (float(i) + float(j))/2.0 )
+
+	# make sure midpoints are all unique
+	midpoints = make_list_unique(midpoints)
+
+	return midpoints
+
+def build_threshold_branches(index, data, threshold):
+	left_branch = []
+	right_branch = []
+	# split the data-sets based on the threshold we found (midpoint)
+	for instance in data:
+		if instance[index] < threshold:
+			left_branch.append(instance)
+		else:
+			right_branch.append(instance)
+
+	return left_branch, right_branch
+
+# split the data-sets based on the threshold (a.k.a. midpoint)
 def numeric_candidate_splits(data, feature, num_items, attributes):
 	"""splits on numeric features use a threshold"""
 	"""sort data by feature value asc"""
@@ -440,6 +484,8 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	# split data based on class
 	neg_list = []
 	pos_list = []
+	neg_points = []
+	pos_points = []
 
 	class_labels = attributes.get('class').get('options')
 	negative = class_labels[0]
@@ -448,8 +494,10 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	for row in data:
 		if row[-1] == negative:
 			neg_list.append(row)
+			neg_points.append(row[index])
 		elif row[-1] == positive:
 			pos_list.append(row)
+			pos_points.append(row[index])
 		else:
 			# this should never happen
 			raise ValueError('Class label mismatches or some ARFF issue....')
@@ -459,29 +507,40 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	else:
 		pass
 
-	neg_sum = sum(row[index] for row in neg_list)
-	pos_sum = sum(row[index] for row in pos_list)
-
-	# initialize our branches & threshold (midpoint)
-	if len(neg_list) == 0:
-		neg_threshold = 0
-	else:
-		neg_threshold = float(neg_sum) / float(len(neg_list))
-
-	if len(pos_list) == 0:
-		pos_threshold = 0
-	else:
-		pos_threshold = float(pos_sum) / float(len(pos_list))
-	
-
 	# use the midpoint / average threshold
-	threshold = (neg_threshold + pos_threshold) / 2
+	threshold = (float(sum(neg_points)) + sum(pos_points)) / (len(neg_points) + len(pos_points))
 
 	name = feature.get('name')
-	if name == 'ca':
-		print 'feature'
+	if name == 'ca' and len(data) < 200:
+		# build all possible midpoint candidate splits; make the decision based on
+		# maxized information gain
+		midpoints = get_possible_midpoints(neg_points, pos_points)
+		print neg_points
+		print pos_points
+		# 1-build the set of candidate splits
+		maxgain = -1
+		for m in midpoints:
+			print m
+			left, right = build_threshold_branches(index, data, threshold)
+			split = NumericCandidateSplit(feature, left, right, m)
+			gain = info_gain(data, split, attributes)
+			print gain
+			if gain > 0 and gain > maxgain:
+				maxgain = gain
+				print 'gain: %s from midpoint %s' % (gain, m)
+				threshold = m
+
+		print 'best threshold!!!!'
+		print threshold
+		exit(0)
+		print neg_max
+		print neg_min
+		print pos_max
+		print pos_min
+		exit(0)
+		print 'feature!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 		print feature
-		print 'data' #data CANT be 200........ ug.......
+		print 'len(data)'
 		print len(data)
 		print 'neg_threshold'
 		print neg_threshold
@@ -489,18 +548,23 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 		print pos_threshold
 		print 'threshold'
 		print threshold
+		print 'len(neg_list)'
+		print len(neg_list)
+		print 'len(pos_list)'
+		print len(pos_list)
+		print 'neg_sum'
+		print neg_sum
+		print 'pos_sum'
+		print pos_sum
+		print 'len(pos_list)'
+		print len(pos_list)
+		print 'len(neg_list)'
+		print len(neg_list)
 		exit(0)
 	else:
 		pass
 
-	left_branch = []
-	right_branch = []
-	# split the data-sets based on the threshold we found (midpoint)
-	for instance in data:
-		if instance[index] < threshold:
-			left_branch.append(instance)
-		else:
-			right_branch.append(instance)
+	left_branch, right_branch = build_threshold_branches(index, data, threshold)
 
 	return NumericCandidateSplit(feature, left_branch, right_branch, threshold)
 

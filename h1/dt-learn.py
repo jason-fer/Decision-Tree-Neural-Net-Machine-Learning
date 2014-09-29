@@ -68,6 +68,7 @@ def nominal_data_split(data, feature_info, value, attributes):
 	else:
 		return subset, p_count, n_count
 
+# it's critical that this function actually splits up the data
 def generate_nodes(data, split, attributes):
 	# use the data to generate a node for best split
 	# name, attribute, value, neg_count, pos_count, data
@@ -85,6 +86,13 @@ def generate_nodes(data, split, attributes):
 	if split_type == 'nominal split': # decision_tree.NominalCandidateSplit
 		for value in feature_options:
 			subset, p, n = nominal_data_split(data, feature_info, value, attributes)
+
+			# subset size, sanity check
+			if len(subset) == len(data):
+				raise ValueError('A subset must be smaller than the parent')
+			else:
+				pass
+
 			# nothing to do if there's nothing in the subset
 			if len(subset) != 0:
 				# print 'nominal node created! :' + str(value) + ', size: ' + str(len(subset))
@@ -96,6 +104,7 @@ def generate_nodes(data, split, attributes):
 			left = split.left_branch
 			right = split.right_branch
 			value = split.threshold
+
 			lp, ln, rp, rn = numeric_data_count(data, left, right, attributes)
 			# nothing to do if there's nothing in the subset
 			if len(left) != 0:
@@ -128,6 +137,10 @@ def make_subtree(data, attributes, m):
 		nodes = generate_nodes(data, split, attributes)
 		for n in nodes:
 			# find the children for each node, & set m = m - 1 (to terminate)
+			if len(n.data) == len(data):
+				raise ValueError('why is subset length == superset length??')
+			else:
+				pass
 			n.children = make_subtree(n.data, attributes, m - 1)
 
 	return nodes
@@ -144,7 +157,7 @@ def print_decision_tree(dtree, data, attributes):
 def node_print(node, depth):
 	if node == []:
 		# print results???
-		print 'the end of the line'
+		print 'the end of the line' #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	else:
 
 		prepend = ''
