@@ -39,7 +39,17 @@ def stopping_criteria_is_met(candidates, data, m, attributes):
 		# Stopping criterian wasn't met
 		return False, None
 
-def split_data_on_feature(data, feature_info, value, attributes):
+def numeric_data_count(data, left, right, attributes):
+	class_labels = attributes.get('class').get('options')
+	lp_count, ln_count = get_class_counts(left, class_labels[0], class_labels[1])
+	rp_count, rn_count = get_class_counts(right, class_labels[0], class_labels[1])
+
+	if len(data) != (lp_count + ln_count + rp_count + rn_count):
+		raise ValueError('subset instance count doesnt match neg / pos count')
+	else:
+		return lp_count, ln_count, rp_count, rn_count
+
+def nominal_data_split(data, feature_info, value, attributes):
 	# value: the current option
 	# data: all instances
 	# feature_info: from the arf file.
@@ -76,7 +86,7 @@ def generate_nodes(data, split, attributes):
 
 	if split_type == 'nominal split': # decision_tree.NominalCandidateSplit
 		for value in feature_options:
-			subset, p, n = split_data_on_feature(data, feature_info, value, attributes)
+			subset, p, n = nominal_data_split(data, feature_info, value, attributes)
 			# nothing to do if there's nothing in the subset
 			if len(subset) != 0:
 				print 'nominal node created! :' + str(value) + ', size: ' + str(len(subset))
@@ -84,11 +94,19 @@ def generate_nodes(data, split, attributes):
 			else:
 				pass
 	else: # 'numeric split' decision_tree.NumericCandidateSplit
-			subset, p, n = split_data_on_feature(data, feature_info, value, attributes)
+			# smaller value first
+			left = split.left_branch
+			right = split.right_branch
+			value = split.threshold
+			lp, ln, rp, rn = numeric_data_count(data, left, right, attributes)
 			# nothing to do if there's nothing in the subset
-			if len(subset) != 0:
-				print 'numeric node created! :' + str(value) + ', size: ' + str(len(subset))
-				nodes.append(NumericNode(feature, value, info_gain, subset, p, n))
+			if len(left) != 0:
+				nodes.append(NumericNode(feature, value, info_gain, left, lp, ln))
+			else:
+				pass
+
+			if len(right) != 0:
+				nodes.append(NumericNode(feature, value, info_gain, right, rp, rn))
 			else:
 				pass
 

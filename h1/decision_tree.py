@@ -430,7 +430,7 @@ def numeric_candidate_splits(data, feature, num_items):
 	grand_total = sum(row[index] for row in sorted_data)
 
 	# initialize our branches & threshold (midpoint)
-	threshold = grand_total / num_items; #is my midpoint incorrect? (incomplete??)
+	threshold = float(grand_total) / float(num_items) #is my midpoint incorrect? (incomplete??)
 	left_branch = []
 	right_branch = []
 
