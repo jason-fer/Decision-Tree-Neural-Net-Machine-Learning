@@ -130,9 +130,9 @@ class NumericNode(Node):
 
 	def __repr__(self):
 		# thal = fixed_defect [4 6]
-		value = round(self.value, 6)
-		obj_string = ' %s = %s' % (str(self.feature), str(value))
-		obj_string += ' [%s %s]' % (str(self.neg_count), str(self.pos_count))
+		# value = self.value
+		obj_string = ' %s = %.6f' % (self.feature, self.value)
+		obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
 
 		if self.is_leaf:
 			if self.pos_count > self.neg_count:
