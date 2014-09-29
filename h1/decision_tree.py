@@ -511,40 +511,10 @@ def nominal_candidate_splits(data, feature, num_items):
 	return NominalCandidateSplit(feature, branches)
 
 def make_list_unique(sorted_list):
-    seen = set()
-    seen_add = seen.add
-    new_list = []
-    return [ x for x in sorted_list if not (x in seen or seen_add(x))]
-
-def get_possible_midpoints(neg_points, pos_points):
-	"""identify adjacent examples that differ in their target class"""
-	"""choose thresholds with maximum information gain"""
-	# a threshold must be a midpoint between a positive & negative instance
-	# step 1 get all unique values for pos / neg
-	# step 2, get all unique midpoints between the unique values
-	# step 3, find the midpoint with maximum information gain
-	
-	neg_points.sort()
-	pos_points.sort()
-	neg_points = make_list_unique(neg_points)
-	pos_points = make_list_unique(pos_points)
-
-	midpoints = []
-	all_thresh = {}
-	threshold_def = {'neg_point':None, 'pos_point':None, 'threshold':None}
-
-	for i in neg_points:
-		for j in pos_points:
-			new_midpoint = (float(i) + float(j))/2.0
-			midpoints.append( new_midpoint )
-			threshold_def['neg_point'] = i
-			threshold_def['pos_point'] = j
-			threshold_def['threshold'] = new_midpoint
-			all_thresh[str(new_midpoint)] = threshold_def
-
-	# make sure midpoints are all unique
-	midpoints = make_list_unique(midpoints)
-	return sorted(midpoints), all_thresh
+	seen = set()
+	seen_add = seen.add
+	new_list = []
+	return [ x for x in sorted_list if not (x in seen or seen_add(x))]
 
 def build_threshold_branches(index, data, threshold):
 	left_branch = []
@@ -563,6 +533,52 @@ def build_threshold_branches(index, data, threshold):
 
 	return left_branch, right_branch
 
+def get_midpoint_candidates(data, index, attributes):
+	"""identify adjacent examples that differ in their target class"""
+	"""choose thresholds with maximum information gain"""
+	# a threshold must be a midpoint between a positive & negative instance
+	# thresholds must be adjacent
+	
+	class_labels = attributes.get('class').get('options')
+	negative = class_labels[0]
+	positive = class_labels[1]
+	prev_row = data[0]
+
+	midpoints = []
+	all_thresh = {}
+	threshold_def = {'neg_point':None, 'pos_point':None, 'threshold':None}
+
+	for row in data:
+		if row[-1] == negative and prev_row[-1] == positive:
+			neg_inst = float(row[index])
+			pos_inst = float(prev_row[index])
+
+			new_midpoint = (pos_inst + neg_inst)/2.0
+			midpoints.append( new_midpoint )
+			threshold_def['neg_point'] = neg_inst
+			threshold_def['pos_point'] = pos_inst
+			threshold_def['threshold'] = new_midpoint
+			all_thresh[str(new_midpoint)] = threshold_def
+		elif row[-1] == positive and prev_row[-1] == negative:
+			pos_inst = float(row[index])
+			neg_inst = float(prev_row[index])
+
+			new_midpoint = (pos_inst + neg_inst)/2.0
+			midpoints.append( new_midpoint )
+			threshold_def['neg_point'] = neg_inst
+			threshold_def['pos_point'] = pos_inst
+			threshold_def['threshold'] = new_midpoint
+			all_thresh[str(new_midpoint)] = threshold_def
+		else:
+			pass
+
+	# make sure midpoints are all unique
+	midpoints = make_list_unique(midpoints)
+	midpoints = sorted(midpoints)
+
+	return midpoints, all_thresh
+
+
 # split the data-sets based on the threshold (a.k.a. midpoint)
 def numeric_candidate_splits(data, feature, num_items, attributes):
 	"""splits on numeric features use a threshold"""
@@ -576,40 +592,16 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	else:
 		pass
 
-	# split data based on class
-	neg_list = []
-	pos_list = []
-	neg_points = []
-	pos_points = []
-
-	class_labels = attributes.get('class').get('options')
-	negative = class_labels[0]
-	positive = class_labels[1]
-
-	for row in data:
-		if row[-1] == negative:
-			neg_list.append(row)
-			neg_points.append(row[index])
-		elif row[-1] == positive:
-			pos_list.append(row)
-			pos_points.append(row[index])
-		else:
-			# this should never happen
-			raise ValueError('Class label mismatches or some ARFF issue....')
-
-	if len(neg_list) + len(pos_list) != len(data):
-			raise ValueError('len(neg_list) + len(pos_list) != len(data):')
-	else:
-		pass
-
 	# build all possible midpoint candidate splits; make the decision based on
 	# maxized information gain
-	midpoints, thresh_defs = get_possible_midpoints(neg_points, pos_points)
+	midpoints, thresh_defs = get_midpoint_candidates(sorted_data, index, attributes)
 
 	# 1-build the set of candidate splits
 	maxgain = -1
 	best_split = None
 
+	# start with the smallest midpoints since a tie is broken with two equal sized
+	# midpoints
 	for m in midpoints:
 		left, right = build_threshold_branches(index, data, m)
 		split = NumericCandidateSplit(feature, left, right, m)
@@ -624,20 +616,20 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 			# print 'gain: %s from midpoint %s' % (gain, m)
 
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	# the_name = feature.get('name')
+	the_name = feature.get('name')
 	# # exit(0)
-	# if the_name == 'thalach' and len(data) == 103:
-	# 	# if threshold == 111.0:
-	# 	for m in midpoints:
-	# 		print m
+	if the_name == 'thalach' and len(data) == 103:
+		# if threshold == 111.0:
+		for m in midpoints:
+			print m
 
-	# 	print 'threshold'
-	# 	print threshold
-	# 	# else:
-	# 	# pass
-	# 	exit(0)
-	# else:
-	# 	pass
+		print 'threshold'
+		print threshold
+		# else:
+		# pass
+		exit(0)
+	else:
+		pass
 
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 

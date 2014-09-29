@@ -170,7 +170,11 @@ def node_print(node, depth):
 
 		print prepend + str(node)
 
+		count = 0
 		for n in node.children:
+			# if n == 0 and type is numeric node, it's negative
+			# if n == 1 and '' 				'' 					it's positive
+
 			node_print(n, depth + 1)
 
 
