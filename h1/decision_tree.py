@@ -125,23 +125,35 @@ class Node(object):
 
 class NumericNode(Node):
 	"""Numeric decision tree node"""
+
 	def get_type(self):
 		return 'nominal node'
 
 	def __repr__(self):
 		# thal = fixed_defect [4 6]
-		# value = self.value
-		obj_string = ' %s = %.6f' % (self.feature, self.value)
-		obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+		value = float(self.value)
 
+		append = ''
 		if self.is_leaf:
 			if self.pos_count > self.neg_count:
-				obj_string += ': positive'
+				append += ': positive'
 			elif self.pos_count <= self.neg_count:
-				obj_string += ': negative'
+				append += ': negative'
 		else:
 			pass
 
+		if append == ': negative':
+			obj_string = '%s <= %.6f' % (self.feature, value)
+			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+		elif append == ': positive':
+			obj_string = '%s > %.6f' % (self.feature, value)
+			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+		else:
+			obj_string = '%s = %.6f' % (self.feature, value)
+			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+
+		obj_string += append
+		
 		return obj_string
 
 class NominalNode(Node):
@@ -151,8 +163,8 @@ class NominalNode(Node):
 
 	def __repr__(self):
 		# thal = fixed_defect [4 6]
-		obj_string = ' %s = %s' % (str(self.feature), str(self.value))
-		obj_string += ' [%s %s]' % (str(self.neg_count), str(self.pos_count))
+		obj_string = '%s = %s' % (self.feature, self.value)
+		obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
 		return obj_string
 
 # ******************** DECISION TREE ********************
