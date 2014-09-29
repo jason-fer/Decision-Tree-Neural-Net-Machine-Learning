@@ -31,6 +31,34 @@ def entropy_calc(data, nlabel, plabel):
 	else:
 		return entropy
 
+def entropy_calc_numeric(data, index, threshold):
+	total_size = len(data)
+	p_count, n_count = get_class_counts(data, nlabel, plabel)
+
+	# proportion 1
+	p1 = float(p_count) / total_size
+	# proportion 2
+	p2 = float(n_count) / total_size
+
+
+	if p1 != 0:
+		proportion1 = - (p1 * math.log(p1, 2))
+	else:
+		proportion1 = 0
+
+	if p2 != 0:
+		proportion2 = - (p2 * math.log(p2, 2))
+	else:
+		proportion2 = 0
+
+	# if entropy is greater than 1 or less than 0, we have an issue
+	entropy = proportion1 + proportion2
+
+	if entropy < 0 or entropy > 1:
+		raise ValueError('Entropy was: ' + str(entropy) + ' (impossible)')
+	else:
+		return entropy
+
 def get_entropy(data, split, attributes):
 	class_labels = attributes.get('class').get('options')
 	# the negative label is always first
@@ -73,9 +101,80 @@ def get_entropy(data, split, attributes):
 
 	return parent_entropy, child_entropies
 
+def get_entropy_x(data, split, attributes):
+	class_labels = attributes.get('class').get('options')
+	# the negative label is always first
+	nlabel = class_labels[0]
+	plabel = class_labels[1]
+
+	# ********************  get parent entropy  ********************
+	parent_entropy = entropy_calc(data, nlabel, plabel)
+	parent_size = len(data)
+
+	# ********************  get children entropy  ********************
+	child_entropies = 0
+	branches = split.get_branches()
+
+	for b in branches:
+		if split.get_type() == 'nominal split':
+			instances = branches[b].get('instances')
+		else: # numeric split
+			instances = b
+
+		# prevent divide by zero error
+		if len(instances) == 0: 
+			continue #do nothing if we have no data
+		else:
+			pass
+
+		if split.threshold > 1.0:
+			print 'split.threshold'
+			print split.threshold
+			child_entropy = entropy_calc_numeric(instances, split.threshold, plabel)
+		else:
+			child_entropy = entropy_calc(instances, nlabel, plabel)
+
+		child_size = len(instances)
+		# sanity check
+		if child_size > parent_size:
+			msg = '[c:' + str(child_size) + ', p:' + str(parent_size) + '] '
+			raise ValueError(msg + 'child size > parent size (impossible)')
+		else:
+			pass
+		
+		# weight the new entropy by the size of the split
+		parnt_chld_ratio = float(child_size) / float(parent_size)
+		# update the sum of the weighted child entropies
+		child_entropies +=  parnt_chld_ratio * child_entropy
+
+	return parent_entropy, child_entropies
+
 def info_gain(data, split, attributes):
 	# determine the info gain in the current split
 	parent_entropy, children_entropy = get_entropy(data, split, attributes)
+
+	# split: Nominal( slope [up 90, flat 93, down 17] )
+	# split: Numeric( trestbps <= 132.315 [115 85], REAL )
+	info_gain = parent_entropy - children_entropy
+
+	# sanity check
+	if info_gain < 0 or info_gain > 1:
+		msg = 'info gain was: ' + str(info_gain) + '... (impossible)!!!'
+		raise ValueError(msg)
+	else:
+		pass
+
+	# print 'split gain:' + str(info_gain)
+	return info_gain
+
+def info_gain_x(data, split, attributes):
+	# determine the info gain in the current split
+	parent_entropy, children_entropy = get_entropy_x(data, split, attributes)
+
+	print 'parent_entropy'
+	print parent_entropy
+	print 'children_entropy'
+	print children_entropy
 
 	# split: Nominal( slope [up 90, flat 93, down 17] )
 	# split: Numeric( trestbps <= 132.315 [115 85], REAL )
@@ -523,7 +622,7 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 			print m
 			left, right = build_threshold_branches(index, data, threshold)
 			split = NumericCandidateSplit(feature, left, right, m)
-			gain = info_gain(data, split, attributes)
+			gain = info_gain_x(data, split, attributes)
 			print gain
 			if gain > 0 and gain > maxgain:
 				maxgain = gain
