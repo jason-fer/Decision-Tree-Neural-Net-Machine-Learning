@@ -134,27 +134,22 @@ class NumericNode(Node):
 		value = float(self.value)
 
 		append = ''
-		if self.is_leaf:
-			if self.pos_count > self.neg_count:
-				append += ': positive'
-			elif self.pos_count <= self.neg_count:
-				append += ': negative'
-		else:
-			pass
-
-		if append == ': negative':
-			obj_string = '%s <= %.6f' % (self.feature, value)
-			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
-		elif append == ': positive':
+		if self.pos_count > self.neg_count:
+			append += ': positive'
 			obj_string = '%s > %.6f' % (self.feature, value)
 			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+		elif self.pos_count <= self.neg_count:
+			obj_string = '%s <= %.6f' % (self.feature, value)
+			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+			append += ': negative'
 		else:
 			obj_string = '%s = %.6f' % (self.feature, value)
 			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
 
-		obj_string += append
-		
-		return obj_string
+		if self.is_leaf():
+			return obj_string + append
+		else:
+			return obj_string
 
 class NominalNode(Node):
 	"""Nominal decision tree node"""
