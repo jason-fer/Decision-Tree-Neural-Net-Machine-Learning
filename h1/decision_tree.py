@@ -469,21 +469,20 @@ def get_possible_midpoints(neg_points, pos_points):
 	# step 2, get all unique midpoints between the unique values
 	# step 3, find the midpoint with maximum information gain
 	
-	neg_uniques = make_list_unique(neg_points)
-	pos_uniques = make_list_unique(pos_points)
-
-	neg_uniques.sort()
-	pos_uniques.sort()
+	neg_points.sort()
+	pos_points.sort()
+	neg_points = make_list_unique(neg_points)
+	pos_points = make_list_unique(pos_points)
 
 	midpoints = []
-	for i in neg_uniques:
-		for j in pos_uniques:
+	for i in neg_points:
+		for j in pos_points:
 			midpoints.append( (float(i) + float(j))/2.0 )
 
 	# make sure midpoints are all unique
 	midpoints = make_list_unique(midpoints)
 
-	return midpoints
+	return sorted(midpoints)
 
 # def get_possible_midpoints_x(neg_points, pos_points):
 # 	neg_uniques = make_list_unique(neg_points)
