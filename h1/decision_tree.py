@@ -50,15 +50,28 @@ def get_entropy(data, split, attributes):
 		else: # numeric split
 			instances = b
 
+		child_size = len(instances)
 		# prevent divide by zero error
-		if len(instances) == 0: 
+		if child_size == 0: 
 			continue #do nothing if we have no data
 		else:
 			pass
-
+		
 		child_entropy = entropy_calc(instances, nlabel, plabel)
 
-		child_size = len(instances)
+		# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+		# feature = split.feature
+		# name = feature.get('name')
+		# if name == 'ca' and len(data) < 200 and split.threshold > 0:
+		# 	print 'split.threshold'
+		# 	print split.threshold
+		# 	print 'child_size'
+		# 	print child_size
+		# 	print 'child_entropy'
+		# 	print child_entropy
+		# else:
+		# 	pass
+		# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 		# sanity check
 		if child_size > parent_size:
 			msg = '[c:' + str(child_size) + ', p:' + str(parent_size) + '] '
@@ -391,10 +404,15 @@ def determine_candidate_splits(data, attributes):
 		feature = attributes.get(attr)
 
 		if feature.get('type') == 'numeric':
-			numeric[attr] = numeric_candidate_splits(data, feature, num_items, a)
+			num_split = numeric_candidate_splits(data, feature, num_items, a)
+			# don't add splits with no information
+			if num_split != None:
+				numeric[attr] = num_split
+			else:
+				pass
+
 		elif feature.get('type') == 'nominal':
 			nominal[attr] = nominal_candidate_splits(data, feature, num_items)
-			pass
 		else:
 			# the class variable
 			pass
@@ -466,6 +484,11 @@ def build_threshold_branches(index, data, threshold):
 		else:
 			right_branch.append(instance)
 
+	if len(data) != len(left_branch) + len(right_branch):
+		raise ValueError('We lost data while splitting!!!!!!!!')
+	else:
+		pass
+
 	return left_branch, right_branch
 
 # split the data-sets based on the threshold (a.k.a. midpoint)
@@ -507,64 +530,24 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	else:
 		pass
 
-	# use the midpoint / average threshold
-	threshold = (float(sum(neg_points)) + sum(pos_points)) / (len(neg_points) + len(pos_points))
+	# build all possible midpoint candidate splits; make the decision based on
+	# maxized information gain
+	midpoints = get_possible_midpoints(neg_points, pos_points)
+	# 1-build the set of candidate splits
+	maxgain = -1
+	best_split = None
 
-	name = feature.get('name')
-	if name == 'ca' and len(data) < 200:
-		# build all possible midpoint candidate splits; make the decision based on
-		# maxized information gain
-		midpoints = get_possible_midpoints(neg_points, pos_points)
-		print neg_points
-		print pos_points
-		# 1-build the set of candidate splits
-		maxgain = -1
-		for m in midpoints:
-			print m
-			left, right = build_threshold_branches(index, data, threshold)
-			split = NumericCandidateSplit(feature, left, right, m)
-			gain = info_gain(data, split, attributes)
-			print gain
-			if gain > 0 and gain > maxgain:
-				maxgain = gain
-				print 'gain: %s from midpoint %s' % (gain, m)
-				threshold = m
+	for m in midpoints:
+		left, right = build_threshold_branches(index, data, m)
+		split = NumericCandidateSplit(feature, left, right, m)
+		gain = info_gain(data, split, attributes)
 
-		print 'best threshold!!!!'
-		print threshold
-		exit(0)
-		print neg_max
-		print neg_min
-		print pos_max
-		print pos_min
-		exit(0)
-		print 'feature!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-		print feature
-		print 'len(data)'
-		print len(data)
-		print 'neg_threshold'
-		print neg_threshold
-		print 'pos_threshold'
-		print pos_threshold
-		print 'threshold'
-		print threshold
-		print 'len(neg_list)'
-		print len(neg_list)
-		print 'len(pos_list)'
-		print len(pos_list)
-		print 'neg_sum'
-		print neg_sum
-		print 'pos_sum'
-		print pos_sum
-		print 'len(pos_list)'
-		print len(pos_list)
-		print 'len(neg_list)'
-		print len(neg_list)
-		exit(0)
-	else:
-		pass
+		# print gain
+		if gain > maxgain:
+			maxgain = gain
+			threshold = m
+			best_split = split
+			# print 'gain: %s from midpoint %s' % (gain, m)
 
-	left_branch, right_branch = build_threshold_branches(index, data, threshold)
-
-	return NumericCandidateSplit(feature, left_branch, right_branch, threshold)
+	return best_split
 
