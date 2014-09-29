@@ -9,9 +9,9 @@ def entropy_calc(data, nlabel, plabel):
 	total_size = len(data)
 	p_count, n_count = get_class_counts(data, nlabel, plabel)
 	# proportion 1
-	p1 = float(p_count) / total_size
+	p1 = float(p_count) / float(total_size)
 	# proportion 2
-	p2 = float(n_count) / total_size
+	p2 = float(n_count) / float(total_size)
 
 	if p1 != 0:
 		proportion1 = - (p1 * math.log(p1, 2))
@@ -82,7 +82,7 @@ def get_entropy(data, split, attributes):
 		# weight the new entropy by the size of the split
 		parnt_chld_ratio = float(child_size) / float(parent_size)
 		# update the sum of the weighted child entropies
-		child_entropies +=  parnt_chld_ratio * child_entropy
+		child_entropies +=  parnt_chld_ratio * float(child_entropy)
 
 	return parent_entropy, child_entropies
 
@@ -458,6 +458,7 @@ def nominal_candidate_splits(data, feature, num_items):
 def make_list_unique(sorted_list):
     seen = set()
     seen_add = seen.add
+    new_list = []
     return [ x for x in sorted_list if not (x in seen or seen_add(x))]
 
 def get_possible_midpoints(neg_points, pos_points):
@@ -471,6 +472,9 @@ def get_possible_midpoints(neg_points, pos_points):
 	neg_uniques = make_list_unique(neg_points)
 	pos_uniques = make_list_unique(pos_points)
 
+	neg_uniques.sort()
+	pos_uniques.sort()
+
 	midpoints = []
 	for i in neg_uniques:
 		for j in pos_uniques:
@@ -480,6 +484,27 @@ def get_possible_midpoints(neg_points, pos_points):
 	midpoints = make_list_unique(midpoints)
 
 	return midpoints
+
+# def get_possible_midpoints_x(neg_points, pos_points):
+# 	neg_uniques = make_list_unique(neg_points)
+# 	pos_uniques = make_list_unique(pos_points)
+
+# 	neg_uniques.sort()
+# 	pos_uniques.sort()
+# 	# print pos_uniques
+# 	# exit(0)
+# 	midpoints = []
+# 	for i in neg_uniques:
+# 		for j in pos_uniques:
+# 			midpoints.append( (float(i) + float(j))/2.0 )
+
+# 	# make sure midpoints are all unique
+# 	midpoints = make_list_unique(midpoints)
+# 	midpoints = sorted(midpoints)
+# 	print midpoints
+# 	exit(0)
+
+# 	return midpoints
 
 def build_threshold_branches(index, data, threshold):
 	left_branch = []
@@ -540,6 +565,8 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	# build all possible midpoint candidate splits; make the decision based on
 	# maxized information gain
 	midpoints = get_possible_midpoints(neg_points, pos_points)
+
+
 	# 1-build the set of candidate splits
 	maxgain = -1
 	best_split = None
@@ -555,6 +582,24 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 			threshold = m
 			best_split = split
 			# print 'gain: %s from midpoint %s' % (gain, m)
+
+	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	# the_name = feature.get('name')
+	# # exit(0)
+	# if the_name == 'thalach' and len(data) == 103:
+	# 	# if threshold == 111.0:
+	# 	for m in midpoints:
+	# 		print m
+
+	# 	print 'threshold'
+	# 	print threshold
+	# 	# else:
+	# 	# pass
+	# 	exit(0)
+	# else:
+	# 	pass
+
+	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 	return best_split
 
