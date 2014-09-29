@@ -298,8 +298,6 @@ class CandidateSplits(object):
 		return info_gain
 
 	def find_best_split(self, data, attributes):
-		# Splits should be chosen using information gain. If there is a tie between two features in their information gain, you should break the tie in favor of the feature listed first in the header section of the ARFF file. If there is a tie between two different thresholds for a numeric feature, you should break the tie in favor of the smaller threshold.
-		#  OrdinaryFindBestSplit(set of training instances D, set of candidate splits C) 
 		maxgain = -1
 		nominal = self.get_nominal_splits()
 		numeric = self.get_numeric_splits()
@@ -379,6 +377,7 @@ def format_best_split(split, gain):
 def determine_candidate_splits(data, attributes):
 	"""Determine all possible candidate splits"""
 	num_items = len(data)
+	a = attributes
 
 	numeric = {}
 	nominal = {}
@@ -387,7 +386,7 @@ def determine_candidate_splits(data, attributes):
 		feature = attributes.get(attr)
 
 		if feature.get('type') == 'numeric':
-			numeric[attr] = numeric_candidate_splits(data, feature, num_items)
+			numeric[attr] = numeric_candidate_splits(data, feature, num_items, a)
 		elif feature.get('type') == 'nominal':
 			nominal[attr] = nominal_candidate_splits(data, feature, num_items)
 			pass
@@ -426,19 +425,77 @@ def nominal_candidate_splits(data, feature, num_items):
 	return NominalCandidateSplit(feature, branches)
 
 
-def numeric_candidate_splits(data, feature, num_items):
+def numeric_candidate_splits(data, feature, num_items, attributes):
 	"""splits on numeric features use a threshold"""
 	"""sort data by feature value asc"""
+
 	index = feature.get('index')
 	sorted_data = sorted(data, key=lambda x: x[index])
-	grand_total = sum(row[index] for row in sorted_data)
+
+	if len(sorted_data) != len(data):
+		raise ValueError('We lost data while sorting!!!!!!!!')
+	else:
+		pass
+
+	# split data based on class
+	neg_list = []
+	pos_list = []
+
+	class_labels = attributes.get('class').get('options')
+	negative = class_labels[0]
+	positive = class_labels[1]
+
+	for row in data:
+		if row[-1] == negative:
+			neg_list.append(row)
+		elif row[-1] == positive:
+			pos_list.append(row)
+		else:
+			# this should never happen
+			raise ValueError('Class label mismatches or some ARFF issue....')
+
+	if len(neg_list) + len(pos_list) != len(data):
+			raise ValueError('len(neg_list) + len(pos_list) != len(data):')
+	else:
+		pass
+
+	neg_sum = sum(row[index] for row in neg_list)
+	pos_sum = sum(row[index] for row in pos_list)
 
 	# initialize our branches & threshold (midpoint)
-	threshold = float(grand_total) / float(num_items) #is my midpoint incorrect? (incomplete??)
+	if len(neg_list) == 0:
+		neg_threshold = 0
+	else:
+		neg_threshold = float(neg_sum) / float(len(neg_list))
+
+	if len(pos_list) == 0:
+		pos_threshold = 0
+	else:
+		pos_threshold = float(pos_sum) / float(len(pos_list))
+	
+
+	# use the midpoint / average threshold
+	threshold = (neg_threshold + pos_threshold) / 2
+
+	name = feature.get('name')
+	if name == 'ca':
+		print 'feature'
+		print feature
+		print 'data' #data CANT be 200........ ug.......
+		print len(data)
+		print 'neg_threshold'
+		print neg_threshold
+		print 'pos_threshold'
+		print pos_threshold
+		print 'threshold'
+		print threshold
+		exit(0)
+	else:
+		pass
+
 	left_branch = []
 	right_branch = []
-
-	# split the data-sets based on the threshold (midpoint)
+	# split the data-sets based on the threshold we found (midpoint)
 	for instance in data:
 		if instance[index] < threshold:
 			left_branch.append(instance)

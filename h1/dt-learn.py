@@ -138,6 +138,8 @@ def print_decision_tree(dtree, data, attributes):
 	# print ''
 	for node in dtree.root:
 		node_print(node, 0)
+		# remove!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		break
 		
 def node_print(node, depth):
 	if node == []:
