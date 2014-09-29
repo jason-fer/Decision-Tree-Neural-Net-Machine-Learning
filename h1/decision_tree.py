@@ -315,7 +315,7 @@ class CandidateSplits(object):
 				# best_split dict
 				best_split = {
 					'name':split, 
-					'split':nominal[split], 
+					'split':numeric[split], 
 					'info_gain': gain,
 					}
 			elif gain > 0 and gain == maxgain:
