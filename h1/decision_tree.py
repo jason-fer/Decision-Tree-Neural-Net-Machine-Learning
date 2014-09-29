@@ -44,10 +44,6 @@ class DecisionTree(object):
 	def __init__(self):
 		self.root = []
 
-	def printTree(self):
-		# print the Decision Tree
-		pass
-
 # ***************** DECISION TREE NUMERIC SPLITS *****************
 class NumericCandidateSplit(object):
 	"""Candidate Split Decision Tree Structure"""
@@ -295,82 +291,74 @@ class CandidateSplits(object):
 
 		for split in nominal:
 			gain = self.info_gain(data, nominal[split], attributes)
+
 			if gain > maxgain:
 				maxgain = gain
 				# best_split dict
-				best_split = {
-					'name':split, 
-					'split':nominal[split], 
-					'info_gain': gain,
-					}
+				best_split = format_best_split(nominal[split], gain)
 			elif gain > 0 and gain == maxgain:
 				curr_feature = nominal[split]
 				prev_feature = best_split.get('split')
-				best_split = info_tiebreaker(curr_feature, prev_feature, attributes)
+				best_split = info_tiebreaker(curr_feature, prev_feature, gain)
 
 		for split in numeric:
 			gain = self.info_gain(data, numeric[split], attributes)
+
 			if gain > maxgain:
 				maxgain = gain
 				# best_split dict
-				best_split = {
-					'name':split, 
-					'split':numeric[split], 
-					'info_gain': gain,
-					}
+				best_split = format_best_split(numeric[split], gain)
 			elif gain > 0 and gain == maxgain:
 				curr_feature = numeric[split]
 				prev_feature = best_split.get('split')
-				best_split = info_tiebreaker(curr_feature, prev_feature, attributes)
+				best_split = info_tiebreaker(curr_feature, prev_feature, gain)
 
 		# print 'max gain: ' +str(best_split)
 		return best_split
 
-	# EvaluateSplit(D, C, S)
-	def evaluate_split(data, candidates, subset):
-		pass
-		#  if a split on S separates instances by class (i.e. ) HD (Y | S) = 0
-		#    // no need to split further 
-		#    return H_D(Y) - H_D(Y | S)
-		#  else 
-		#    for outcomes k in set {1, 2} of S // let's assume binary splits
-		#      // see what the splits at the next level would be
-		#      Dk = subset of instances that have outcome k
-		#      Sk = OrdinaryFindBestSplit(Dk, C - S) 
-		#      // return information gain that would result from this 2-level subtree
-		#    return HD(Y) - HD(Y | S,S1,S2)
-
 # ***************** CANDIDATE SPLITS HELPER METHODS *****************
 
 # (incomplete!!)  need to finish the tiebreaker feature
-def info_tiebreaker():
-	# Algo: if both are numeric, lowest value wins, otherwise, just use the attribute ordering!!!
-	raise ValueError('The tiebreaker function isn\'t written yet!')
-	# break tie btwn nominal features w/ order of attribute file
-	# the lowest index wins
-	prev_index = get_feature_index(feature, attributes)
-	curr_index = get_feature_index(feature, attributes)
+def info_tiebreaker(curr_feature, prev_feature, gain):
+	curr_type = curr_feature.get_type()
+	prev_type = prev_feature.get_type()
 
-	# break tie btwn numeric features w/ smaller attribute
-	# the lower value wins
-	prev_value = get_feature_value(feature)
-	curr_value = get_feature_value(feature)
+	numeric = 'numeric split'
+	nominal = 'nominal split'
 
-	# w/ nominal vs numeric features, nominal wins (ask professor!!!!!!!!!!!!!!!)
-	pass
-	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	if curr_type == 'numeric split' and prev_type == 'numeric split':
+		# if both are numeric, lowest value wins
+		if curr_feature.threshold == prev_feature.threshold:
+			# both are equal; resolve with the ARFF order
+			pass
+		elif curr_feature.threshold < prev_feature.threshold:
+			return format_best_split(curr_feature, gain)
+		else:
+			return format_best_split(prev_feature, gain)
+	else:
+		pass
 
-def get_feature_index(feature, attributes):
-	raise ValueError('The get_feature_index function isn\'t written yet!')
-	index = 0
-	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	return index
+	# if we got here, lower ARFF index wins!
+	curr_index = curr_feature.feature.get('index')
+	prev_index = prev_feature.feature.get('index')
 
-def get_feature_value(feature):
-	raise ValueError('The get_feature_value function isn\'t written yet!')
-	value = 0
-	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	return value
+	if curr_index == prev_index:
+		# this should never happen
+		raise ValueError('curr_index can\'t be equal to prev index!!!!!!')
+	if curr_index < prev_index:
+		return format_best_split(curr_feature, gain)
+	else:
+		return format_best_split(prev_feature, gain)
+
+def format_best_split(split, gain):
+
+	best_split = {
+		'name':split.name, 
+		'split':split,
+		'info_gain': gain,
+		}
+
+	return best_split
 
 def determine_candidate_splits(data, attributes):
 	"""Determine all possible candidate splits"""

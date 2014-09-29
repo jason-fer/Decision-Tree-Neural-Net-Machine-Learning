@@ -24,7 +24,6 @@ def stopping_criteria_is_met(candidates, data, m, attributes):
 	# 1. candidates all have the same class
 	is_homogenous, result = candidates.is_homogenous(data, attributes)
 	if is_homogenous:
-		print candidate_count
 		return True, result
 	# 2. there are fewer than m training instances reaching the node
 	elif candidate_count == 0:
@@ -89,7 +88,7 @@ def generate_nodes(data, split, attributes):
 			subset, p, n = nominal_data_split(data, feature_info, value, attributes)
 			# nothing to do if there's nothing in the subset
 			if len(subset) != 0:
-				print 'nominal node created! :' + str(value) + ', size: ' + str(len(subset))
+				# print 'nominal node created! :' + str(value) + ', size: ' + str(len(subset))
 				nodes.append(NominalNode(feature, value, info_gain, subset, p, n))
 			else:
 				pass
@@ -131,8 +130,6 @@ def make_subtree(data, attributes, m):
 		nodes = generate_nodes(data, split, attributes)
 		for n in nodes:
 			# find the children for each node, & set m = m - 1 (to terminate)
-			print 'len(n.data)'
-			print len(n.data)
 			n.children = make_subtree(n.data, attributes, m - 1)
 
 	return nodes
