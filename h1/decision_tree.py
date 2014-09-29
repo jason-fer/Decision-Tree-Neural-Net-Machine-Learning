@@ -548,6 +548,19 @@ def get_midpoint_candidates(data, index, attributes):
 	all_thresh = {}
 	threshold_def = {'neg_point':None, 'pos_point':None, 'threshold':None}
 
+	# if len(data) == 103 and index == 7:
+	# 	for d in data:
+	# 		my_str = str(d[index])
+	# 		if d[-1] == 'negative':
+	# 			my_str += ' -'
+	# 		else:
+	# 			my_str += ' +'
+				
+	# 		print my_str
+	# 	exit(0)
+	# else:
+	# 	pass
+
 	for row in data:
 		if row[-1] == negative and prev_row[-1] == positive:
 			neg_inst = float(row[index])
@@ -571,6 +584,9 @@ def get_midpoint_candidates(data, index, attributes):
 			all_thresh[str(new_midpoint)] = threshold_def
 		else:
 			pass
+			
+		# don't forget to update prev_row!!!!!!!!!
+		prev_row = row
 
 	# make sure midpoints are all unique
 	midpoints = make_list_unique(midpoints)
@@ -592,9 +608,11 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	else:
 		pass
 
+	data = sorted_data
+
 	# build all possible midpoint candidate splits; make the decision based on
 	# maxized information gain
-	midpoints, thresh_defs = get_midpoint_candidates(sorted_data, index, attributes)
+	midpoints, thresh_defs = get_midpoint_candidates(data, index, attributes)
 
 	# 1-build the set of candidate splits
 	maxgain = -1
@@ -617,8 +635,17 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	# the_name = feature.get('name')
-	# # # exit(0)
+	# # exit(0)
 	# if the_name == 'thalach' and len(data) == 103:
+	# 	# for d in data:
+	# 	# 	my_str = str(d[index])
+	# 	# 	if d[-1] == 'negative':
+	# 	# 		my_str += ' -'
+	# 	# 	else:
+	# 	# 		my_str += ' +'
+				
+	# 	# 	print my_str
+	# 	# exit(0)
 	# 	# if threshold == 111.0:
 	# 	for m in midpoints:
 	# 		print m
