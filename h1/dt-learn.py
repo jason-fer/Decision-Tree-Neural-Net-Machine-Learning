@@ -65,12 +65,12 @@ def generate_nodes(data, split, attributes):
 	# name, attribute, value, neg_count, pos_count, data
 	nodes = [] # either left, then right or a list
 
-	info_gain = split.get('info_gain')
 	# split on this feature
 	feature = split.get('name') # name of attribute
 	feature_options = attributes.get(feature).get('options')
 	feature_info = attributes.get(feature)
 
+	print split
 	split = split.get('split')
 	split_type = split.get_type()
 
@@ -101,16 +101,18 @@ def make_subtree(data, attributes, m):
 	# candidates.test_split_counts(data) #debug
 	stop_now, reason = stopping_criteria_is_met(candidates, data, m, attributes)
 	if stop_now: # leaf-node
-		print 'reason!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-		print reason
-		raise ValueError('stopping function not written')
-		#   # determine class label/probabilities for N
+		return []
+		# print 'reason!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+		# print reason
+		# raise ValueError('stopping function not written')
+	  # determine class label/probabilities for N
 	  # node = Node('attribute', 'value') ?
 		pass
 	else:
-	  # make an internal node N
 	  split = candidates.find_best_split(data, attributes)
 	  nodes = generate_nodes(data, split, attributes)
+	  for n in nodes:
+			n.children.append(make_subtree(n.data, attributes, m))
 
 	return nodes
 
