@@ -116,6 +116,7 @@ class Node(object):
 		self.neg_count = neg
 		self.data = data
 		self.children = []
+		self.thresh_def = {}
 
 	def get_type(self):
 		return 'generic node'
@@ -125,31 +126,73 @@ class Node(object):
 
 class NumericNode(Node):
 	"""Numeric decision tree node"""
+	def __init__(self, feature, value, info_gain, data, pos, neg, thresh_def):
+		self.feature = feature
+		self.value = value
+		self.info_gain = info_gain
+		# number of neg / pos classes with this attribute
+		self.pos_count = pos
+		self.neg_count = neg
+		self.data = data
+		self.thresh_def = thresh_def
+		self.children = []
 
 	def get_type(self):
 		return 'nominal node'
+
+	def get_thresh_def(self):
+		return self.thresh_def
 
 	def __repr__(self):
 		# thal = fixed_defect [4 6]
 		value = float(self.value)
 
-		append = ''
-		if self.pos_count > self.neg_count:
-			append += ': positive'
-			obj_string = '%s > %.6f' % (self.feature, value)
-			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
-		elif self.pos_count <= self.neg_count:
-			obj_string = '%s <= %.6f' % (self.feature, value)
-			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
-			append += ': negative'
+		# LTE or GT threshold?
+		right = '>'
+		left = '<='
+		# are negative values left or right of threshold?
+		# are positive values left or right of threshold?
+		thresh_def = self.get_thresh_def()
+		if thresh_def == {}:
+			raise ValueError('thresh_def not found!!')
 		else:
+			pass
+
+		# thresh_def {'neg_point':None, 'pos_point':None, 'threshold':None}
+		neg_point = thresh_def.get('neg_point')
+		pos_point = thresh_def.get('pos_point')
+		if neg_point <= value:
+			neg_sign = left
+			pos_sign = right
+		else:
+			neg_sign = right
+			pos_sign = left
+
+		# build string output for this node
+		if self.pos_count > self.neg_count:
+			obj_string = '%s %s %.6f' % (self.feature, pos_sign, value)
+			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+			if self.is_leaf():
+				obj_string += ': positive'
+			else:
+				pass
+		elif self.pos_count <= self.neg_count:
+			obj_string = '%s %s %.6f' % (self.feature, neg_sign, value)
+			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+			if self.is_leaf():
+				obj_string += ': negative'
+			else:
+				pass
+		else:
+			# negative wins?
 			obj_string = '%s = %.6f' % (self.feature, value)
 			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+			if self.is_leaf():
+				obj_string += ': negative'
+			else:
+				pass
 
-		if self.is_leaf():
-			return obj_string + append
-		else:
-			return obj_string
+		return obj_string
 
 class NominalNode(Node):
 	"""Nominal decision tree node"""
@@ -188,6 +231,15 @@ class NumericCandidateSplit(object):
 		mid = str(self.threshold)
 		opt = str(self.options)
 		obj_string += ' <= %s [%s %s], %s )' % (mid, left, right, opt)
+
+		if self.is_leaf():
+			if self.pos_count > self.neg_count:
+				obj_string += ': positive'
+			else:
+				obj_string += ': negative'
+		else:
+			pass
+
 		return obj_string
 
 	def get_branches(self):
@@ -207,6 +259,9 @@ class NumericCandidateSplit(object):
 			total_size += b
 
 		return total_size
+
+	def get_thresh_def(self):
+		return self.thresh_def
 
 	def get_type(self):
 		return 'numeric split'
@@ -475,35 +530,21 @@ def get_possible_midpoints(neg_points, pos_points):
 	pos_points = make_list_unique(pos_points)
 
 	midpoints = []
+	all_thresh = {}
+	threshold_def = {'neg_point':None, 'pos_point':None, 'threshold':None}
+
 	for i in neg_points:
 		for j in pos_points:
-			midpoints.append( (float(i) + float(j))/2.0 )
+			new_midpoint = (float(i) + float(j))/2.0
+			midpoints.append( new_midpoint )
+			threshold_def['neg_point'] = i
+			threshold_def['pos_point'] = j
+			threshold_def['threshold'] = new_midpoint
+			all_thresh[str(new_midpoint)] = threshold_def
 
 	# make sure midpoints are all unique
 	midpoints = make_list_unique(midpoints)
-
-	return sorted(midpoints)
-
-# def get_possible_midpoints_x(neg_points, pos_points):
-# 	neg_uniques = make_list_unique(neg_points)
-# 	pos_uniques = make_list_unique(pos_points)
-
-# 	neg_uniques.sort()
-# 	pos_uniques.sort()
-# 	# print pos_uniques
-# 	# exit(0)
-# 	midpoints = []
-# 	for i in neg_uniques:
-# 		for j in pos_uniques:
-# 			midpoints.append( (float(i) + float(j))/2.0 )
-
-# 	# make sure midpoints are all unique
-# 	midpoints = make_list_unique(midpoints)
-# 	midpoints = sorted(midpoints)
-# 	print midpoints
-# 	exit(0)
-
-# 	return midpoints
+	return sorted(midpoints), all_thresh
 
 def build_threshold_branches(index, data, threshold):
 	left_branch = []
@@ -563,8 +604,7 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 
 	# build all possible midpoint candidate splits; make the decision based on
 	# maxized information gain
-	midpoints = get_possible_midpoints(neg_points, pos_points)
-
+	midpoints, thresh_defs = get_possible_midpoints(neg_points, pos_points)
 
 	# 1-build the set of candidate splits
 	maxgain = -1
@@ -579,6 +619,7 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 		if gain > maxgain:
 			maxgain = gain
 			threshold = m
+			split.thresh_def = thresh_defs.get(str(m),'')
 			best_split = split
 			# print 'gain: %s from midpoint %s' % (gain, m)
 

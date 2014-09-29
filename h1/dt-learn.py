@@ -108,12 +108,16 @@ def generate_nodes(data, split, attributes):
 			lp, ln, rp, rn = numeric_data_count(data, left, right, attributes)
 			# nothing to do if there's nothing in the subset
 			if len(left) != 0:
-				nodes.append(NumericNode(feature, value, info_gain, left, lp, ln))
+				t = split.get_thresh_def()
+				numeric_node = NumericNode(feature, value, info_gain, left, lp, ln, t)
+				nodes.append(numeric_node)
 			else:
 				pass
 
 			if len(right) != 0:
-				nodes.append(NumericNode(feature, value, info_gain, right, rp, rn))
+				t = split.get_thresh_def()
+				numeric_node = NumericNode(feature, value, info_gain, left, lp, ln, t)
+				nodes.append(numeric_node)
 			else:
 				pass
 
