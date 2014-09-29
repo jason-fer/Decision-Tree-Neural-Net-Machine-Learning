@@ -16,12 +16,6 @@ class Node(object):
 		self.data = data
 		self.children = []
 
-	# def __repr__(self):
-	# 	# thal = fixed_defect [4 6]
-	# 	# nominal: attr = value [neg pos]
-	# 	# numeric: attr <= value [neg pos]
-	# 	obj_string = ''
-
 	def get_type(self):
 		return 'generic node'
 
@@ -33,10 +27,32 @@ class NumericNode(Node):
 	def get_type(self):
 		return 'nominal node'
 
+	def __repr__(self):
+		# thal = fixed_defect [4 6]
+		value = round(self.value, 6)
+		obj_string = ' %s = %s' % (str(self.feature), str(value))
+		obj_string += ' [%s %s]' % (str(self.neg_count), str(self.pos_count))
+
+		if self.is_leaf:
+			if self.pos_count > self.neg_count:
+				obj_string += ': positive'
+			elif self.pos_count <= self.neg_count:
+				obj_string += ': negative'
+		else:
+			pass
+
+		return obj_string
+
 class NominalNode(Node):
 	"""Nominal decision tree node"""
 	def get_type(self):
 		return 'numeric node'
+
+	def __repr__(self):
+		# thal = fixed_defect [4 6]
+		obj_string = ' %s = %s' % (str(self.feature), str(self.value))
+		obj_string += ' [%s %s]' % (str(self.neg_count), str(self.pos_count))
+		return obj_string
 
 # ******************** DECISION TREE ********************
 class DecisionTree(object):

@@ -132,6 +132,29 @@ def make_subtree(data, attributes, m):
 
 	return nodes
 
+def print_decision_tree(dtree, data, attributes):
+	# If the classes of the training instances reaching a leaf are equally represented, 
+	# the leaf should predict the first class listed in the ARFF file.
+	# print ''
+	for node in dtree.root:
+		node_print(node, 0)
+		
+def node_print(node, depth):
+	if node == []:
+		# print results???
+		print 'the end of the line'
+	else:
+
+		prepend = ''
+		spacer = '|       '
+		for x in range(depth):
+			prepend += spacer
+
+		print prepend + str(node)
+
+		for n in node.children:
+			node_print(n, depth + 1)
+
 
 def main(args):
 	"""usage dt-learn <train-set-file> <test-set-file> m """
@@ -149,6 +172,7 @@ def main(args):
 
 	# homogenous check (incomplete)
 	dtree = DecisionTree()
+	# test homogenous result by creating a generic homogenous ARFF File!!!!!!!!!!!!!!!!!!!!!!!
 	# is_homogenous, result = homogenous_check(data, class_labels[0], class_labels[1]);
 	# if result != None:
 	# 	# need to produce a single node tree
@@ -163,6 +187,7 @@ def main(args):
 	dtree.root = make_subtree(data, attributes, m)
 
 	# Output results (incomplete)
+	print_decision_tree(dtree, data, attributes)	
 
 
 if __name__ == "__main__":
