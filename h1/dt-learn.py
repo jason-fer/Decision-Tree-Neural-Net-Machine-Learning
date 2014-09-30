@@ -20,7 +20,7 @@ NominalNode = decision_tree.NominalNode
 
 def stopping_criteria_is_met(candidates, data, m, attributes, best_split):
 	info_gain = best_split.get('info_gain')
-	candidate_count = len(data)
+	training_instance_count = len(data)
 	is_homogenous, class_label = candidates.is_homogenous(data, attributes)
 
 	# stop if:
@@ -28,13 +28,13 @@ def stopping_criteria_is_met(candidates, data, m, attributes, best_split):
 	if is_homogenous:
 		return True, class_label # so we know what the result was
 	# 2. there are fewer than m training instances reaching the node
-	elif candidate_count == 0:
+	elif training_instance_count == 0:
 		return True, False
 	# 3. no feature has positive information gain
 	elif info_gain == 0:
 		return True, False
 	# 4. or candidates is empty
-	elif candidate_count < m:
+	elif training_instance_count < m:
 		return True, False
 	else:
 		# Stopping criterian wasn't met
@@ -144,7 +144,7 @@ def make_subtree(data, attributes, m):
 				raise ValueError('why is subset length == superset length??')
 			else:
 				pass
-			n.children = make_subtree(n.data, attributes, m - 1)
+			n.children = make_subtree(n.data, attributes, m)
 
 	return nodes
 
@@ -191,8 +191,6 @@ def main(args):
 
 	# Top-down decision tree build
 	dtree = DecisionTree()
-	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx fix stopping criteria!!!!!!
-	# dtree.root = make_subtree(data, attributes, m + 10)
 	dtree.root = make_subtree(data, attributes, m)
 
 	# Output results

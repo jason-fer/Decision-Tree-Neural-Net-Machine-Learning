@@ -529,7 +529,6 @@ def get_midpoint_candidates(data, index, attributes):
 	"""choose thresholds with maximum information gain"""
 	# a threshold must be a midpoint between a positive & negative instance
 	# thresholds must be adjacent
-	
 	class_labels = attributes.get('class').get('options')
 	negative = class_labels[0]
 	positive = class_labels[1]
@@ -539,45 +538,60 @@ def get_midpoint_candidates(data, index, attributes):
 	all_thresh = {}
 	threshold_def = {'neg_point':None, 'pos_point':None, 'threshold':None}
 
-	# if len(data) == 103 and index == 7:
-	# 	for d in data:
-	# 		my_str = str(d[index])
-	# 		if d[-1] == 'negative':
-	# 			my_str += ' -'
-	# 		else:
-	# 			my_str += ' +'
-				
-	# 		print my_str
-	# 	exit(0)
-	# else:
-	# 	pass
-
+	# algorithm:
+	# 1- for each negative point, find the next positive point (that is greater)
+	# 2- for each positive point, find the next negative point (that is greater)
+	# i.e. it's ok to skip the next point if it's the OPPOSITE class AND the same value.
+	# soln? remove identical adjacent nodes
+	
+	clean_data = []
 	for row in data:
-		if row[-1] == negative and prev_row[-1] == positive:
-			neg_inst = float(row[index])
-			pos_inst = float(prev_row[index])
-
-			new_midpoint = (pos_inst + neg_inst)/2.0
-			midpoints.append( new_midpoint )
-			threshold_def['neg_point'] = neg_inst
-			threshold_def['pos_point'] = pos_inst
-			threshold_def['threshold'] = new_midpoint
-			all_thresh[str(new_midpoint)] = threshold_def
-		elif row[-1] == positive and prev_row[-1] == negative:
-			pos_inst = float(row[index])
-			neg_inst = float(prev_row[index])
-
-			new_midpoint = (pos_inst + neg_inst)/2.0
-			midpoints.append( new_midpoint )
-			threshold_def['neg_point'] = neg_inst
-			threshold_def['pos_point'] = pos_inst
-			threshold_def['threshold'] = new_midpoint
-			all_thresh[str(new_midpoint)] = threshold_def
-		else:
+		if row[-1] == prev_row[-1] and row[index] == prev_row[index]:
+			# throw out duplicates
 			pass
-			
-		# don't forget to update prev_row!!!!!!!!!
+		else:
+			clean_data.append(row)
 		prev_row = row
+
+	# use a data set where adjacent duplicates are removed
+	data = clean_data
+
+	count = 0
+	for row in data:
+		# only traverse (increment count) after we looked ahead & made the next 
+		# relevant comparison (if any)
+		count += 1
+		# traverse until we find the next non duplicate
+		for next_row in data[count:]:
+			if row[index] == next_row[index]:
+				continue
+			elif row[-1] != next_row[-1]: # we have a point of contrast
+				if next_row[-1] == negative and row[-1] == positive:
+					neg_inst = float(next_row[index])
+					pos_inst = float(row[index])
+
+					new_midpoint = (pos_inst + neg_inst)/2.0
+					midpoints.append( new_midpoint )
+					threshold_def['neg_point'] = neg_inst
+					threshold_def['pos_point'] = pos_inst
+					threshold_def['threshold'] = new_midpoint
+					all_thresh[str(new_midpoint)] = threshold_def
+				elif next_row[-1] == positive and row[-1] == negative:
+					pos_inst = float(next_row[index])
+					neg_inst = float(row[index])
+
+					new_midpoint = (pos_inst + neg_inst)/2.0
+					midpoints.append( new_midpoint )
+					threshold_def['neg_point'] = neg_inst
+					threshold_def['pos_point'] = pos_inst
+					threshold_def['threshold'] = new_midpoint
+					all_thresh[str(new_midpoint)] = threshold_def
+				else:
+					raise ValueError('Midpoint calculation blew up!!!!!!!')
+					break
+			else:
+				# the adjacent value is the same, we have no midpoint candidate here
+				break
 
 	# make sure midpoints are all unique
 	midpoints = make_list_unique(midpoints)
@@ -627,17 +641,18 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	# the_name = feature.get('name')
 	# # exit(0)
-	# if the_name == 'thalach' and len(data) == 103:
-	# 	# for d in data:
-	# 	# 	my_str = str(d[index])
-	# 	# 	if d[-1] == 'negative':
-	# 	# 		my_str += ' -'
-	# 	# 	else:
-	# 	# 		my_str += ' +'
-				
-	# 	# 	print my_str
-	# 	# exit(0)
-	# 	# if threshold == 111.0:
+	# if the_name == 'trestbps' and len(data) == 60:
+	# 	for d in data:
+	# 		my_str = str(d[index])
+	# 		if d[-1] == 'negative':
+	# 			my_str += ' -'
+	# 		else:
+	# 			my_str += ' +'
+	# 		print my_str
+			
+	# 	print 'threshold'
+	# 	print threshold
+	# 	exit(0)
 	# 	for m in midpoints:
 	# 		print m
 
@@ -648,7 +663,6 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	# 	exit(0)
 	# else:
 	# 	pass
-
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 	return best_split
