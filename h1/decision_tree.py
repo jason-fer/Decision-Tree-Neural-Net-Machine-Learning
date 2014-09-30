@@ -205,6 +205,26 @@ class NominalNode(Node):
 		obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
 		return obj_string
 
+	# def __repr__(self):
+	# 	# feature: name, index, type, options, e.g.:
+	# 	# {'name': thal, index': 5, 'type': 'numeric', 'options': [u't', u'f']}
+	# 	obj_string = 'Numeric( ' + str(self.name)
+	# 	left = str(len(self.left_branch))
+	# 	right = str(len(self.right_branch))
+	# 	mid = str(self.threshold)
+	# 	opt = str(self.options)
+	# 	obj_string += ' <= %s [%s %s], %s )' % (mid, left, right, opt)
+
+	# 	if self.is_leaf():
+	# 		if self.pos_count > self.neg_count:
+	# 			obj_string += ': positive'
+	# 		else:
+	# 			obj_string += ': negative'
+	# 	else:
+	# 		pass
+
+	# 	return obj_string
+
 # ******************** DECISION TREE ********************
 class DecisionTree(object):
 	"""Machine Learning Decision Tree Structure"""
@@ -221,26 +241,6 @@ class NumericCandidateSplit(object):
 		self.threshold = threshold #aka, midpoint
 		self.name = feature.get('name')
 		self.options = feature.get('options')
-
-	def __repr__(self):
-		# feature: name, index, type, options, e.g.:
-		# {'name': thal, index': 5, 'type': 'numeric', 'options': [u't', u'f']}
-		obj_string = 'Numeric( ' + str(self.name)
-		left = str(len(self.left_branch))
-		right = str(len(self.right_branch))
-		mid = str(self.threshold)
-		opt = str(self.options)
-		obj_string += ' <= %s [%s %s], %s )' % (mid, left, right, opt)
-
-		if self.is_leaf():
-			if self.pos_count > self.neg_count:
-				obj_string += ': positive'
-			else:
-				obj_string += ': negative'
-		else:
-			pass
-
-		return obj_string
 
 	def get_branches(self):
 		return [self.left_branch, self.right_branch]
@@ -372,12 +372,6 @@ class CandidateSplits(object):
 		class_labels = attributes.get('class').get('options')
 		return homogenous_check(data, class_labels[0], class_labels[1]);
 
-	def no_info_gain(self): # (incomplete)
-		# raise ValueError('this function isn not written') xxxxxxxxxxxxxxxxxxxxxxxx
-		# if any candidate has any information gain, then this is false.
-		# this is true if not a single feature has info gain
-		return False
-
 	def find_best_split(self, data, attributes):
 		maxgain = -1
 		nominal = self.get_nominal_splits()
@@ -501,7 +495,6 @@ def nominal_candidate_splits(data, feature, num_items):
 			'instances':[] 
 			}
 		count = count + 1
-
 
 	# match each instance with the right respective branch
 	for instance in data:

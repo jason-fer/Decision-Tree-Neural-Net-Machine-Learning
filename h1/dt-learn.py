@@ -18,25 +18,27 @@ determine_candidate_splits = decision_tree.determine_candidate_splits
 NumericNode = decision_tree.NumericNode
 NominalNode = decision_tree.NominalNode
 
-def stopping_criteria_is_met(candidates, data, m, attributes):
-	# stop if:
+def stopping_criteria_is_met(candidates, data, m, attributes, best_split):
+	info_gain = best_split.get('info_gain')
 	candidate_count = len(data)
+	is_homogenous, class_label = candidates.is_homogenous(data, attributes)
+
+	# stop if:
 	# 1. candidates all have the same class
-	is_homogenous, result = candidates.is_homogenous(data, attributes)
 	if is_homogenous:
-		return True, result
+		return True, class_label # so we know what the result was
 	# 2. there are fewer than m training instances reaching the node
 	elif candidate_count == 0:
-		return True, 0
-	# 3. no feature has positive information gain (incomplete)
-	elif candidates.no_info_gain():
-		return True, 'no_info_gain'
+		return True, False
+	# 3. no feature has positive information gain
+	elif info_gain == 0:
+		return True, False
 	# 4. or candidates is empty
 	elif candidate_count < m:
-		return True, 'm'
+		return True, False
 	else:
 		# Stopping criterian wasn't met
-		return False, None
+		return False, False
 
 def numeric_data_count(data, left, right, attributes):
 	class_labels = attributes.get('class').get('options')
@@ -78,7 +80,7 @@ def generate_nodes(data, split, attributes):
 	feature = split.get('name') # name of attribute
 	feature_options = attributes.get(feature).get('options')
 	feature_info = attributes.get(feature)
-	info_gain = split.get('split')
+	info_gain = split.get('info_gain')
 	# get the internal split class (inside the current dict)
 	split = split.get('split')
 	split_type = split.get_type()
@@ -126,19 +128,18 @@ def generate_nodes(data, split, attributes):
 def make_subtree(data, attributes, m):
 	candidates = determine_candidate_splits(data, attributes)
 
+	best_split = candidates.find_best_split(data, attributes)
+
 	nodes = []
 	# candidates.test_split_counts(data) #debug
-	stop_now, reason = stopping_criteria_is_met(candidates, data, m, attributes)
+	stop_now, class_label = stopping_criteria_is_met(candidates, data, m, attributes, best_split)
 	if stop_now: # leaf-node
 		return []
-		# does this make any difference?
-		# raise ValueError('stopping function not written')
 		# determine class label/probabilities for N
 		# node = Node('attribute', 'value') ?
 		pass
 	else:
-		split = candidates.find_best_split(data, attributes)
-		nodes = generate_nodes(data, split, attributes)
+		nodes = generate_nodes(data, best_split, attributes)
 		for n in nodes:
 			# find the children for each node, & set m = m - 1 (to terminate)
 			if len(n.data) == len(data):
@@ -158,11 +159,9 @@ def print_decision_tree(dtree, data, attributes):
 		
 def node_print(node, depth):
 	if node == []:
-		# print results???
-		# removexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-		print 'the end of the line' #xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+		pass
+		#empty node
 	else:
-
 		prepend = ''
 		spacer = '|       '
 		for x in range(depth):
@@ -192,23 +191,14 @@ def main(args):
 	class_labels = attributes.get('class').get('options')
 	data = arff_file['data']
 
-	# homogenous check (incomplete)
+
+	# Top-down decision tree build
 	dtree = DecisionTree()
-	# test homogenous result by creating a generic homogenous ARFF File!!!!!!!!!!!!!!!!!!!!!!!
-	# is_homogenous, result = homogenous_check(data, class_labels[0], class_labels[1]);
-	# if result != None:
-	# 	# need to produce a single node tree
-	# 	dtree.root = Node('class', result)
-	# else:
-	# 	pass
-
-	# check to see if predicting attributes are empty (incomplete)
-	# ?? dtree.root = Node('class', result)
-
-	# Top-down decision tree build (incomplete)
+	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx fix stopping criteria!!!!!!
+	# dtree.root = make_subtree(data, attributes, m + 10)
 	dtree.root = make_subtree(data, attributes, m)
 
-	# Output results (incomplete)
+	# Output results
 	print_decision_tree(dtree, data, attributes)	
 
 
