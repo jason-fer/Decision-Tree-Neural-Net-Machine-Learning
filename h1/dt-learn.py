@@ -221,7 +221,7 @@ def main(args):
 	"""usage python dt-learn.py $1 $2 $3"""
 
 	# stopping criteria m
-	m = 20
+	m = 2
 	# init
 	# arff_file = load_data('examples/homogenous_check.arff')
 	arff_file = load_data('examples/diabetes_train.arff')

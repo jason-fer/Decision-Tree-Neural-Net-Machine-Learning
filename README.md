@@ -8,8 +8,8 @@ m = 4  --- passed
 m = 2  --- passed
 
 diabetes_train:
-m = 20
-m = 10
+m = 20 --- passed
+m = 10 --- passed
 m = 4
 m = 2
 
