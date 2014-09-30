@@ -216,16 +216,18 @@ def node_print(node, depth, attributes):
 			node_print(n, depth + 1, attributes)
 
 
+# incomplete (make it accept arguments)
 def main(args):
 	"""usage dt-learn <train-set-file> <test-set-file> m """
 	"""where m is the number of training instances; used in stopping criteria"""
 	"""usage python dt-learn.py $1 $2 $3"""
 
 	# stopping criteria m
-	m = 20
+	m = 10
 	# init
-	arff_file = load_data('examples/homogenous_check.arff')
-	# arff_file = load_data('examples/heart_train.arff')
+	# arff_file = load_data('examples/homogenous_check.arff')
+	# arff_file = load_data('examples/diabetes_train.arff')
+	arff_file = load_data('examples/heart_train.arff')
 	attributes = get_attributes(arff_file['attributes'])
 	class_labels = attributes.get('class').get('options')
 	data = arff_file['data']

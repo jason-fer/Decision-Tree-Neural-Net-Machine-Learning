@@ -589,24 +589,103 @@ def get_midpoint_candidates(data, index, attributes):
 	# soln? remove identical adjacent nodes
 	
 	clean_data = []
+	neg_rows = {}
+	pos_rows = {}
+
+	# remove duplicates of the same type by inserting them into dict objects
 	for row in data:
-		if row[-1] == prev_row[-1] and row[index] == prev_row[index]:
-			# throw out duplicates
-			pass
+		if row[-1] == negative:
+			neg_rows[str(row[index])] = row
 		else:
-			clean_data.append(row)
-		prev_row = row
+			pos_rows[str(row[index])] = row
+
+	# merge data back together
+	for row in neg_rows:
+		clean_data.append(neg_rows[row])
+	for row in pos_rows:
+		clean_data.append(pos_rows[row])
+
+	# if index == 0 and len(orig_data) == 99:
+	# 	print neg_rows
+	# 	exit(0)
+	# 	print pos_rows
+	# else:
+	# 	pass
+
+	# print clean_data
+	# exit(0)
 
 	# use a data set where adjacent duplicates are removed
-	data = clean_data
+	orig_data = data
+	data = sorted(clean_data, key=lambda x: x[index])	
+
+	# if index == 0 and len(orig_data) == 99:
+	# 	print 'this is age (index 11)'
+	# 	for d in data:
+	# 		my_str = str(d[index])
+	# 		if d[-1] == negative:
+	# 			my_str += ' -'
+	# 		else:
+	# 			my_str += ' +'
+	# 		print my_str
+	# 	exit(0)
+	# else:
+	# 	pass
 
 	count = 0
 	for row in data:
 		# only traverse (increment count) after we looked ahead & made the next 
 		# relevant comparison (if any)
 		count += 1
+
+		# edge case: (why we need a 3rd row)
+		# we may need to peek ahead two rows
+		# e.g. -55.0, -56.0, +56.0 (e.g. compare 55 vs 56)
+		# if these two rows are the same class, see if 3rd row is diff class & equal to 2nd row
+
 		# traverse until we find the next non duplicate
+		inner_count = count
 		for next_row in data[count:]:
+			inner_count += 1
+
+			# 3rd row edge case check
+			# e.g. -55.0, -56.0, +56.0 (e.g. compare 55 vs 56)
+			# 1-if the next is homogenous & greater (it will always be greater)
+			if row[-1] == next_row[-1]:
+				for third_row in data[inner_count:]:
+					# 2-if the third row is a diff class that first... 
+					# 3-if the third row index == same as 2nd row index...
+					if row[-1] != third_row[-1] and next_row[index] == third_row[index]:
+						# we found an edge case threshold.. add it!
+						# incomplete (add threshold)
+						if third_row[-1] == negative and row[-1] == positive:
+							neg_inst = float(third_row[index])
+							pos_inst = float(row[index])
+
+							new_midpoint = (pos_inst + neg_inst)/2.0
+							midpoints.append( new_midpoint )
+							threshold_def['neg_point'] = neg_inst
+							threshold_def['pos_point'] = pos_inst
+							threshold_def['threshold'] = new_midpoint
+							all_thresh[str(new_midpoint)] = threshold_def
+						elif third_row[-1] == positive and row[-1] == negative:
+							pos_inst = float(third_row[index])
+							neg_inst = float(row[index])
+
+							new_midpoint = (pos_inst + neg_inst)/2.0
+							midpoints.append( new_midpoint )
+							threshold_def['neg_point'] = neg_inst
+							threshold_def['pos_point'] = pos_inst
+							threshold_def['threshold'] = new_midpoint
+							all_thresh[str(new_midpoint)] = threshold_def
+						else:
+							raise ValueError('Midpoint calculation blew up!!!!!!!')
+							break
+					else:
+						pass
+			else:
+				pass
+
 			if row[index] == next_row[index]:
 				continue
 			elif row[-1] != next_row[-1]: # we have a point of contrast
@@ -636,6 +715,13 @@ def get_midpoint_candidates(data, index, attributes):
 			else:
 				# the adjacent value is the same, we have no midpoint candidate here
 				break
+
+	# age check.......
+	# if index == 0 and len(orig_data) == 99:
+	# 	print midpoints
+	# 	exit(0)
+	# else:
+	# 	pass
 
 	# make sure midpoints are all unique
 	midpoints = make_list_unique(midpoints)
@@ -684,10 +770,17 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	# the_name = feature.get('name')
+
+	# if the_name == 'age':
+	# 	print feature
+	# 	exit(0)
+	# else:
+	# 	pass
+
 	# class_labels = attributes.get('class').get('options')
 	# nlabel = class_labels[0]
 	# # exit(0)
-	# if the_name == 'oldpeak' and maxgain > 0 and threshold == 0.65:
+	# if the_name == 'ca' and len(data) == 10:
 	# 	for d in data:
 	# 		my_str = str(d[index])
 	# 		if d[-1] == nlabel:
