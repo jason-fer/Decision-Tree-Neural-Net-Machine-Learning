@@ -143,49 +143,74 @@ class NumericNode(Node):
 	def get_thresh_def(self):
 		return self.thresh_def
 
-	def dt_print(self, is_leaf):
+	def get_signs(self, attributes):
+		threshold = float(self.value)
+		class_labels = attributes.get('class').get('options')
+		negative = class_labels[0]
+		positive = class_labels[1]
+		data = self.data
+
+		# we need the index for our counts
+		index = attributes.get(self.feature).get('index')
+
+		neg_below = 0
+		neg_above = 0
+		pos_below = 0
+		pos_above = 0
+
+		for row in data:
+			# count rows below the threshold
+			if row[index] <= threshold:
+				if row[-1] == negative:
+					neg_below += 1
+				else:
+					pos_below += 1
+			# count rows above the threshold
+			else:
+				if row[-1] == negative:
+					neg_above += 1
+				else:
+					pos_above += 1
+
+		# LTE or GT threshold?
+		above = '>' #  GT
+		below = '<=' # LTE
+
+		# this gets confusing because it's all very relative
+
+		# now we can determine the sign
+		if self.pos_count > self.neg_count:
+			# positive wins, was the majority above or below?
+			if pos_above > pos_below:
+				sign = above
+			else:
+				sign = below
+		else: # self.pos_count <= self.neg_count:
+			# negative wins, was the majority above or below?
+			if neg_above > neg_below:
+				sign = above
+			else:
+				sign = below
+		
+		return sign
+
+	def dt_print(self, is_leaf, attributes):
 		# thal = fixed_defect [4 6]
 		value = float(self.value)
 		base = ' [%s %s]' % (self.neg_count, self.pos_count)
-		# LTE or GT threshold?
-		right = '>'
-		left = '<='
-		# are negative values left or right of threshold?
-		# are positive values left or right of threshold?
-		thresh_def = self.get_thresh_def()
-		# if thresh_def == {}:
-		# 	raise ValueError('thresh_def not found!!')
-		# else:
-		# 	pass
 
-		# thresh_def {'neg_point':None, 'pos_point':None, 'threshold':None}
-		neg_point = thresh_def.get('neg_point')
-		pos_point = thresh_def.get('pos_point')
-		if neg_point <= value:
-			neg_sign = left
-			pos_sign = right
-		else:
-			neg_sign = right
-			pos_sign = left
+		sign = self.get_signs(attributes)
 
 		# build string output for this node
 		if self.pos_count > self.neg_count:
-			obj_string = '%s %s %.6f' % (self.feature, pos_sign, value)
+			obj_string = '%s %s %.6f' % (self.feature, sign, value)
 			obj_string += base
 			if is_leaf == True:
 				obj_string += ': positive'
 			else:
 				pass
-		elif self.pos_count <= self.neg_count:
-			obj_string = '%s %s %.6f' % (self.feature, neg_sign, value)
-			obj_string += base
-			if is_leaf == True:
-				obj_string += ': negative'
-			else:
-				pass
-		else:
-			# negative wins?
-			obj_string = '%s = %.6f' % (self.feature, value)
+		else: #self.pos_count <= self.neg_count: (negative wins)
+			obj_string = '%s %s %.6f' % (self.feature, sign, value)
 			obj_string += base
 			if is_leaf == True:
 				obj_string += ': negative'
@@ -199,7 +224,7 @@ class NominalNode(Node):
 	def get_type(self):
 		return 'numeric node'
 
-	def dt_print(self, is_leaf):
+	def dt_print(self, is_leaf, attributes):
 		# thal = fixed_defect [4 6]
 		# obj_string = '%s = %s' % (self.feature, self.value)
 		# obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
@@ -646,7 +671,7 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	# the_name = feature.get('name')
 	# # exit(0)
-	# if the_name == 'trestbps' and len(data) == 60:
+	# if the_name == 'oldpeak' and maxgain > 0 and threshold == 0.65:
 	# 	for d in data:
 	# 		my_str = str(d[index])
 	# 		if d[-1] == 'negative':

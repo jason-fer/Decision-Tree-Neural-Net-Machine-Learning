@@ -153,9 +153,9 @@ def print_decision_tree(dtree, data, attributes):
 	# the leaf should predict the first class listed in the ARFF file.
 	# print ''
 	for node in dtree.root:
-		node_print(node, 0)
+		node_print(node, 0, attributes)
 		
-def node_print(node, depth):
+def node_print(node, depth, attributes):
 	if node == []:
 		pass
 		#empty node
@@ -166,17 +166,17 @@ def node_print(node, depth):
 			prepend += spacer
 
 		if node.children == []:
-			is_child = True
+			is_leaf = True
 		else:
-			is_child = False
-			
-		print prepend + str(node.dt_print(is_child))
+			is_leaf = False
+
+		print prepend + str(node.dt_print(is_leaf, attributes))
 
 		count = 0
 		for n in node.children:
 			# if n == 0 and type is numeric node, it's negative
 			# if n == 1 and '' 				'' 					it's positive
-			node_print(n, depth + 1)
+			node_print(n, depth + 1, attributes)
 
 
 def main(args):
