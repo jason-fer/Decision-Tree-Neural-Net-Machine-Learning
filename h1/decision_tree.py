@@ -143,10 +143,10 @@ class NumericNode(Node):
 	def get_thresh_def(self):
 		return self.thresh_def
 
-	def __repr__(self):
+	def dt_print(self, is_leaf):
 		# thal = fixed_defect [4 6]
 		value = float(self.value)
-
+		base = ' [%s %s]' % (self.neg_count, self.pos_count)
 		# LTE or GT threshold?
 		right = '>'
 		left = '<='
@@ -171,23 +171,23 @@ class NumericNode(Node):
 		# build string output for this node
 		if self.pos_count > self.neg_count:
 			obj_string = '%s %s %.6f' % (self.feature, pos_sign, value)
-			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
-			if self.is_leaf() == True:
+			obj_string += base
+			if is_leaf == True:
 				obj_string += ': positive'
 			else:
 				pass
 		elif self.pos_count <= self.neg_count:
 			obj_string = '%s %s %.6f' % (self.feature, neg_sign, value)
-			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
-			if self.is_leaf() == True:
+			obj_string += base
+			if is_leaf == True:
 				obj_string += ': negative'
 			else:
 				pass
 		else:
 			# negative wins?
 			obj_string = '%s = %.6f' % (self.feature, value)
-			obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
-			if self.is_leaf() == True:
+			obj_string += base
+			if is_leaf == True:
 				obj_string += ': negative'
 			else:
 				pass
@@ -199,31 +199,36 @@ class NominalNode(Node):
 	def get_type(self):
 		return 'numeric node'
 
-	def __repr__(self):
+	def dt_print(self, is_leaf):
 		# thal = fixed_defect [4 6]
-		obj_string = '%s = %s' % (self.feature, self.value)
-		obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+		# obj_string = '%s = %s' % (self.feature, self.value)
+		# obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+		base = ' [%s %s]' % (self.neg_count, self.pos_count)
+
+		if self.pos_count > self.neg_count:
+			obj_string = '%s = %s' % (self.feature, self.value)
+			obj_string += base
+			if is_leaf == True:
+				obj_string += ': positive'
+			else:
+				pass
+		elif self.pos_count <= self.neg_count:
+			obj_string = '%s = %s' % (self.feature, self.value)
+			obj_string += base
+			if is_leaf == True:
+				obj_string += ': negative'
+			else:
+				pass
+		else:
+			# negative wins?
+			obj_string = '%s = %s' % (self.feature, self.value)
+			obj_string += base
+			if is_leaf == True:
+				obj_string += ': negative'
+			else:
+				pass
+
 		return obj_string
-
-	# def __repr__(self):
-	# 	# feature: name, index, type, options, e.g.:
-	# 	# {'name': thal, index': 5, 'type': 'numeric', 'options': [u't', u'f']}
-	# 	obj_string = 'Numeric( ' + str(self.name)
-	# 	left = str(len(self.left_branch))
-	# 	right = str(len(self.right_branch))
-	# 	mid = str(self.threshold)
-	# 	opt = str(self.options)
-	# 	obj_string += ' <= %s [%s %s], %s )' % (mid, left, right, opt)
-
-	# 	if self.is_leaf():
-	# 		if self.pos_count > self.neg_count:
-	# 			obj_string += ': positive'
-	# 		else:
-	# 			obj_string += ': negative'
-	# 	else:
-	# 		pass
-
-	# 	return obj_string
 
 # ******************** DECISION TREE ********************
 class DecisionTree(object):
@@ -649,7 +654,7 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 	# 		else:
 	# 			my_str += ' +'
 	# 		print my_str
-			
+
 	# 	print 'threshold'
 	# 	print threshold
 	# 	exit(0)

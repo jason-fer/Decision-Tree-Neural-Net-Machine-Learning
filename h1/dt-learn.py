@@ -165,7 +165,12 @@ def node_print(node, depth):
 		for x in range(depth):
 			prepend += spacer
 
-		print prepend + str(node)
+		if node.children == []:
+			is_child = True
+		else:
+			is_child = False
+			
+		print prepend + str(node.dt_print(is_child))
 
 		count = 0
 		for n in node.children:
