@@ -1,6 +1,19 @@
 cs760-homework
 ==============
 
+heart_train:
+m = 20 --- passed
+m = 10 (1x error)
+m = 4 (6x errors)
+m = 2 (11x + error)
+
+diabetes_train:
+m = 20
+m = 10
+m = 4
+m = 2
+
+
 
 http://stackoverflow.com/questions/2915471/install-a-python-package-into-a-different-directory-using-pip
 

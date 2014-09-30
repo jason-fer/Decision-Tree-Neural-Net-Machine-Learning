@@ -187,8 +187,8 @@ def main(args):
 	# stopping criteria m
 	m = 20
 	# init
-	# arff_file = load_data('examples/diabetes_train.arff')
-	arff_file = load_data('examples/heart_train.arff')
+	arff_file = load_data('examples/diabetes_train.arff')
+	# arff_file = load_data('examples/heart_train.arff')
 	attributes = get_attributes(arff_file['attributes'])
 	class_labels = attributes.get('class').get('options')
 	data = arff_file['data']
