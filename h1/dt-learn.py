@@ -152,12 +152,45 @@ def make_subtree(data, attributes, m):
 
 	return nodes
 
+def print_single_root_node(data, attributes):
+	neg_count = 0
+	pos_count = 0
+
+	class_labels = attributes.get('class').get('options')
+	negative = class_labels[0]
+	positive = class_labels[1]
+
+	for row in data:
+		# count rows below the threshold
+			if row[-1] == negative:
+				neg_count += 1
+			else:
+				pos_count += 1
+
+	obj_string = 'single node [%s %s]' % (neg_count, pos_count)
+
+	# this is a leaf, make a prediction:
+	if neg_count >= pos_count:
+		# predict negative
+		obj_string += ': negative (always)'
+	else:
+		# predict positive
+		obj_string += ': positive (always)'
+
+	# that's it! print our one node...
+	print obj_string
+
+
 def print_decision_tree(dtree, data, attributes):
 	# If the classes of the training instances reaching a leaf are equally represented, 
 	# the leaf should predict the first class listed in the ARFF file.
 	# print ''
-	for node in dtree.root:
-		node_print(node, 0, attributes)
+	if dtree.root == []:
+		# print 'homogenous!!!'
+		print_single_root_node(data, attributes)
+	else:
+		for node in dtree.root:
+			node_print(node, 0, attributes)
 		
 def node_print(node, depth, attributes):
 	if node == []:
@@ -191,8 +224,8 @@ def main(args):
 	# stopping criteria m
 	m = 20
 	# init
-	# arff_file = load_data('examples/diabetes_train.arff')
-	arff_file = load_data('examples/heart_train.arff')
+	arff_file = load_data('examples/homogenous_check.arff')
+	# arff_file = load_data('examples/heart_train.arff')
 	attributes = get_attributes(arff_file['attributes'])
 	class_labels = attributes.get('class').get('options')
 	data = arff_file['data']
