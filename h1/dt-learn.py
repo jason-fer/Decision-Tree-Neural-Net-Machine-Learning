@@ -213,6 +213,17 @@ def node_print(node, depth, attributes):
 			# if n == 1 and '' 				'' 					it's positive
 			node_print(n, depth + 1, attributes)
 
+def get_arguments(args):
+	if len(args) == 4:
+		train_set_file = args[1]
+		test_set_file = args[2]
+		# stopping criteria m
+		m = int(args[3])
+	else:
+		print 'usage dt-learn <train-set-file> <test-set-file> m '
+		exit(0)
+
+	return train_set_file, test_set_file, m
 
 # incomplete (make it accept arguments)
 def main(args):
@@ -220,12 +231,13 @@ def main(args):
 	"""where m is the number of training instances; used in stopping criteria"""
 	"""usage python dt-learn.py $1 $2 $3"""
 
-	# stopping criteria m
-	m = 2
-	# init
+	train_set_file, test_set_file, m = get_arguments(args)
+
 	# arff_file = load_data('examples/homogenous_check.arff')
-	arff_file = load_data('examples/diabetes_train.arff')
+	# arff_file = load_data('examples/diabetes_train.arff')
 	# arff_file = load_data('examples/heart_train.arff')
+	arff_file = load_data(train_set_file)
+	
 	attributes = get_attributes(arff_file['attributes'])
 	class_labels = attributes.get('class').get('options')
 	data = arff_file['data']
