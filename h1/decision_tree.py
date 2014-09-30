@@ -619,9 +619,9 @@ def get_midpoint_candidates(data, index, attributes):
 	orig_data = data
 	data = sorted(clean_data, key=lambda x: x[index])	
 
-	# if index == 0 and len(orig_data) == 99:
-	# 	print 'this is age (index 11)'
-	# 	for d in data:
+	# if index == 9 and len(orig_data) == 4:
+	# 	# print 'this is age (index 0)' #age index 0, ca index 11, oldpeak 9
+	# 	for d in orig_data:
 	# 		my_str = str(d[index])
 	# 		if d[-1] == negative:
 	# 			my_str += ' -'
@@ -717,7 +717,7 @@ def get_midpoint_candidates(data, index, attributes):
 				break
 
 	# age check.......
-	# if index == 0 and len(orig_data) == 99:
+	# if index == 0 and len(orig_data) == 6 and midpoints != []:
 	# 	print midpoints
 	# 	exit(0)
 	# else:
@@ -770,8 +770,7 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	# the_name = feature.get('name')
-
-	# if the_name == 'age':
+	# if the_name == 'oldpeak':
 	# 	print feature
 	# 	exit(0)
 	# else:

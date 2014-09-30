@@ -99,12 +99,7 @@ def generate_nodes(data, split, attributes):
 			else:
 				pass
 
-			# nothing to do if there's nothing in the subset
-			if len(subset) != 0:
-				# print 'nominal node created! :' + str(value) + ', size: ' + str(len(subset))
-				nodes.append(NominalNode(feature, value, info_gain, subset, p, n))
-			else:
-				pass
+			nodes.append(NominalNode(feature, value, info_gain, subset, p, n))
 	else: # 'numeric split' decision_tree.NumericCandidateSplit
 			# smaller value first
 			left = split.left_branch
@@ -148,7 +143,11 @@ def make_subtree(data, attributes, m):
 				raise ValueError('why is subset length == superset length??')
 			else:
 				pass
-			n.children = make_subtree(n.data, attributes, m)
+
+			if len(n.data) == 0:
+				continue
+			else:
+				n.children = make_subtree(n.data, attributes, m)
 
 	return nodes
 
@@ -209,7 +208,6 @@ def node_print(node, depth, attributes):
 
 		print prepend + str(node.dt_print(is_leaf, attributes))
 
-		count = 0
 		for n in node.children:
 			# if n == 0 and type is numeric node, it's negative
 			# if n == 1 and '' 				'' 					it's positive
@@ -223,7 +221,7 @@ def main(args):
 	"""usage python dt-learn.py $1 $2 $3"""
 
 	# stopping criteria m
-	m = 10
+	m = 4
 	# init
 	# arff_file = load_data('examples/homogenous_check.arff')
 	# arff_file = load_data('examples/diabetes_train.arff')
