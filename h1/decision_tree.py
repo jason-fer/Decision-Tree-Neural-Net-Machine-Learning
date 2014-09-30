@@ -473,8 +473,6 @@ def determine_candidate_splits(data, attributes):
 			# the class variable
 			pass
 
-	# delete all splits that have no instances (incomplete)
-	# clean splits!!!!!!!!!!!!
 	# dump_splits(splits) # debug
 	return CandidateSplits(numeric, nominal)
 

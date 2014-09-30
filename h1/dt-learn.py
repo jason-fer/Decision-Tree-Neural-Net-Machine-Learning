@@ -127,9 +127,7 @@ def generate_nodes(data, split, attributes):
 
 def make_subtree(data, attributes, m):
 	candidates = determine_candidate_splits(data, attributes)
-
 	best_split = candidates.find_best_split(data, attributes)
-
 	nodes = []
 	# candidates.test_split_counts(data) #debug
 	stop_now, class_label = stopping_criteria_is_met(candidates, data, m, attributes, best_split)
@@ -173,7 +171,6 @@ def node_print(node, depth):
 		for n in node.children:
 			# if n == 0 and type is numeric node, it's negative
 			# if n == 1 and '' 				'' 					it's positive
-
 			node_print(n, depth + 1)
 
 
