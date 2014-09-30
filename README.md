@@ -4,8 +4,8 @@ cs760-homework
 heart_train:
 m = 20 --- passed
 m = 10 --- passed
-m = 4 (5x errors)
-m = 2 (11x + error)
+m = 4  --- passed
+m = 2  --- passed
 
 diabetes_train:
 m = 20

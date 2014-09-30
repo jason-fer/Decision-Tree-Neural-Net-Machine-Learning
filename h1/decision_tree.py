@@ -210,6 +210,10 @@ class NumericNode(Node):
 		return sign
 
 	def dt_print(self, is_leaf, attributes):
+		class_labels = attributes.get('class').get('options')
+		negative = class_labels[0]
+		positive = class_labels[1]
+
 		# thal = fixed_defect [4 6]
 		value = float(self.value)
 		base = ' [%s %s]' % (self.neg_count, self.pos_count)
@@ -221,16 +225,55 @@ class NumericNode(Node):
 			obj_string = '%s %s %.6f' % (self.feature, sign, value)
 			obj_string += base
 			if is_leaf == True:
-				obj_string += ': positive'
+				obj_string += ': ' + str(positive)
 			else:
 				pass
 		else: #self.pos_count <= self.neg_count: (negative wins)
 			obj_string = '%s %s %.6f' % (self.feature, sign, value)
 			obj_string += base
 			if is_leaf == True:
-				obj_string += ': negative'
+				obj_string += ': ' + str(negative)
 			else:
 				pass
+
+		# find oldpeak <= 0.450000
+		# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+		# if self.feature == 'chol' and value == 232.5:
+		# 	print ''
+		# 	print obj_string
+		# 	feature_name = 'oldpeak'
+		# 	index = attributes.get(feature_name).get('index')
+		# 	midpoints, thresh_defs = get_midpoint_candidates(self.data, index, attributes)
+
+		# 	best_split = None
+		# 	data = self.data
+		# 	maxgain = -1
+
+		# 	for m in midpoints:
+		# 		left, right = build_threshold_branches(index, data, m)
+		# 		split = NumericCandidateSplit(attributes.get(feature_name), left, right, m)
+		# 		gain = info_gain(data, split, attributes)
+
+		# 		# print gain
+		# 		if gain > maxgain:
+		# 			maxgain = gain
+		# 			threshold = m
+		# 			split.thresh_def = thresh_defs.get(str(m),'')
+		# 			best_split = split
+				
+		# 	print 'midpoints'	
+		# 	print midpoints	
+		# 	print 'best_split.threshold'
+		# 	print best_split.threshold
+		# 	print 'maxgain'
+		# 	print maxgain
+		# 	
+		# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+		# trestbps maxgain == 0.811278124459
+		# oldpeak maxgain  == 0.811278124459
+		# 	exit(0)
+		# else:
+		# 	pass
 
 		return obj_string
 
@@ -243,20 +286,24 @@ class NominalNode(Node):
 		# thal = fixed_defect [4 6]
 		# obj_string = '%s = %s' % (self.feature, self.value)
 		# obj_string += ' [%s %s]' % (self.neg_count, self.pos_count)
+		class_labels = attributes.get('class').get('options')
+		negative = class_labels[0]
+		positive = class_labels[1]
+		
 		base = ' [%s %s]' % (self.neg_count, self.pos_count)
 
 		if self.pos_count > self.neg_count:
 			obj_string = '%s = %s' % (self.feature, self.value)
 			obj_string += base
 			if is_leaf == True:
-				obj_string += ': positive'
+				obj_string += ': ' + str(positive)
 			else:
 				pass
 		elif self.pos_count <= self.neg_count:
 			obj_string = '%s = %s' % (self.feature, self.value)
 			obj_string += base
 			if is_leaf == True:
-				obj_string += ': negative'
+				obj_string += ': ' + str(negative)
 			else:
 				pass
 		else:
@@ -264,7 +311,7 @@ class NominalNode(Node):
 			obj_string = '%s = %s' % (self.feature, self.value)
 			obj_string += base
 			if is_leaf == True:
-				obj_string += ': negative'
+				obj_string += ': ' + str(negative)
 			else:
 				pass
 
@@ -434,6 +481,8 @@ class CandidateSplits(object):
 				curr_feature = nominal[split]
 				prev_feature = best_split.get('split')
 				best_split = info_tiebreaker(curr_feature, prev_feature, gain)
+			else:
+				pass
 
 		for split in numeric:
 			gain = info_gain(data, numeric[split], attributes)
@@ -446,6 +495,8 @@ class CandidateSplits(object):
 				curr_feature = numeric[split]
 				prev_feature = best_split.get('split')
 				best_split = info_tiebreaker(curr_feature, prev_feature, gain)
+			else:
+				pass
 
 		# print 'max gain: ' +str(best_split)
 		return best_split
@@ -456,29 +507,26 @@ def info_tiebreaker(curr_feature, prev_feature, gain):
 	curr_type = curr_feature.get_type()
 	prev_type = prev_feature.get_type()
 
-	numeric = 'numeric split'
-	nominal = 'nominal split'
+	# numeric = 'numeric split'
+	# nominal = 'nominal split'
 
-	if curr_type == 'numeric split' and prev_type == 'numeric split':
-		# if both are numeric, lowest value wins
-		if curr_feature.threshold == prev_feature.threshold:
-			# both are equal; resolve with the ARFF order
-			pass
-		elif curr_feature.threshold < prev_feature.threshold:
-			return format_best_split(curr_feature, gain)
-		else:
-			return format_best_split(prev_feature, gain)
-	else:
-		pass
+	# if curr_type == 'numeric split' and prev_type == 'numeric split':
+	# 	# if both are numeric, lowest value wins
+	# 	if curr_feature.threshold == prev_feature.threshold:
+	# 		# both are equal; resolve with the ARFF order
+	# 		pass
+	# 	elif curr_feature.threshold < prev_feature.threshold:
+	# 		return format_best_split(curr_feature, gain)
+	# 	else:
+	# 		return format_best_split(prev_feature, gain)
+	# else:
+	# 	pass
 
 	# if we got here, lower ARFF index wins!
 	curr_index = curr_feature.feature.get('index')
 	prev_index = prev_feature.feature.get('index')
 
-	if curr_index == prev_index:
-		# this should never happen
-		raise ValueError('curr_index can\'t be equal to prev index!!!!!!')
-	if curr_index < prev_index:
+	if curr_index <= prev_index:
 		return format_best_split(curr_feature, gain)
 	else:
 		return format_best_split(prev_feature, gain)

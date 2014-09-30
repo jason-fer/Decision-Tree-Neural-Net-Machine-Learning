@@ -171,10 +171,10 @@ def print_single_root_node(data, attributes):
 	# this is a leaf, make a prediction:
 	if neg_count >= pos_count:
 		# predict negative
-		obj_string += ': negative (always)'
+		obj_string += ': ' + str(negative)
 	else:
 		# predict positive
-		obj_string += ': positive (always)'
+		obj_string += ': ' + str(positive)
 
 	# that's it! print our one node...
 	print obj_string
@@ -221,11 +221,11 @@ def main(args):
 	"""usage python dt-learn.py $1 $2 $3"""
 
 	# stopping criteria m
-	m = 4
+	m = 20
 	# init
 	# arff_file = load_data('examples/homogenous_check.arff')
-	# arff_file = load_data('examples/diabetes_train.arff')
-	arff_file = load_data('examples/heart_train.arff')
+	arff_file = load_data('examples/diabetes_train.arff')
+	# arff_file = load_data('examples/heart_train.arff')
 	attributes = get_attributes(arff_file['attributes'])
 	class_labels = attributes.get('class').get('options')
 	data = arff_file['data']
