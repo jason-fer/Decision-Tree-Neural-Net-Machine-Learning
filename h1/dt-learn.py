@@ -19,7 +19,11 @@ NumericNode = decision_tree.NumericNode
 NominalNode = decision_tree.NominalNode
 
 def stopping_criteria_is_met(candidates, data, m, attributes, best_split):
-	info_gain = best_split.get('info_gain')
+	if not best_split:
+		info_gain = 0
+	else:
+		info_gain = best_split.get('info_gain')
+
 	training_instance_count = len(data)
 	is_homogenous, class_label = candidates.is_homogenous(data, attributes)
 
@@ -187,12 +191,11 @@ def main(args):
 	# stopping criteria m
 	m = 20
 	# init
-	arff_file = load_data('examples/diabetes_train.arff')
-	# arff_file = load_data('examples/heart_train.arff')
+	# arff_file = load_data('examples/diabetes_train.arff')
+	arff_file = load_data('examples/heart_train.arff')
 	attributes = get_attributes(arff_file['attributes'])
 	class_labels = attributes.get('class').get('options')
 	data = arff_file['data']
-
 
 	# Top-down decision tree build
 	dtree = DecisionTree()

@@ -40,6 +40,11 @@ def get_entropy(data, split, attributes):
 	# ********************  get parent entropy  ********************
 	parent_entropy = entropy_calc(data, nlabel, plabel)
 	parent_size = len(data)
+	# print 'parent_entropy'
+	# print parent_entropy
+	# print 'parent_size'
+	# print parent_size
+	# exit(0)
 
 	# ********************  get children entropy  ********************
 	child_entropies = 0
@@ -58,6 +63,12 @@ def get_entropy(data, split, attributes):
 			pass
 		
 		child_entropy = entropy_calc(instances, nlabel, plabel)
+
+		# print 'child_entropy'
+		# print child_entropy
+		# print 'child_size'
+		# print child_size
+		# exit(0)
 
 		# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 		# feature = split.feature
@@ -92,12 +103,16 @@ def info_gain(data, split, attributes):
 
 	# split: Nominal( slope [up 90, flat 93, down 17] )
 	# split: Numeric( trestbps <= 132.315 [115 85], REAL )
-	info_gain = parent_entropy - children_entropy
+	if str(parent_entropy) == str(children_entropy):
+		# avoid bizzare edge case
+		info_gain = 0
+	else:
+		info_gain = parent_entropy - children_entropy
 
-	# sanity check
 	if info_gain < 0 or info_gain > 1:
-		msg = 'info gain was: ' + str(info_gain) + '... (impossible)!!!'
-		raise ValueError(msg)
+			# failed sanity check
+			msg = 'info gain was: ' + str(info_gain) + '... (impossible)!!!'
+			raise ValueError(msg)
 	else:
 		pass
 
@@ -488,7 +503,6 @@ def determine_candidate_splits(data, attributes):
 
 	for attr in attributes:
 		feature = attributes.get(attr)
-
 		if feature.get('type') == 'numeric':
 			num_split = numeric_candidate_splits(data, feature, num_items, a)
 			# don't add splits with no information
@@ -670,11 +684,13 @@ def numeric_candidate_splits(data, feature, num_items, attributes):
 
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	# the_name = feature.get('name')
+	# class_labels = attributes.get('class').get('options')
+	# nlabel = class_labels[0]
 	# # exit(0)
 	# if the_name == 'oldpeak' and maxgain > 0 and threshold == 0.65:
 	# 	for d in data:
 	# 		my_str = str(d[index])
-	# 		if d[-1] == 'negative':
+	# 		if d[-1] == nlabel:
 	# 			my_str += ' -'
 	# 		else:
 	# 			my_str += ' +'

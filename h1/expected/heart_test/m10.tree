@@ -1,4 +1,3 @@
-
 thal = fixed_defect [4 6]
 |       ca <= 0.500000 [4 0]: negative
 |       ca > 0.500000 [0 6]: positive
