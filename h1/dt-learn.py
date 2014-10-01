@@ -225,12 +225,84 @@ def get_arguments(args):
 
 	return train_set_file, test_set_file, m
 
-def get_prediction(row, attributes):
+
+def leaf_test(node):
+	if node.children == []:
+		return True
+	else:
+		return False
+
+def is_match(node, row, attributes):
+	# does the current node match the prediction
+	index = node.get_index(attributes)
+	if node.get_type() == 'nominal node':
+		if row[index] == node.get_value():
+			return True
+		else:
+			return False
+	else: # this is a numeric node
+		# is this the 'right' node?
+		above = '>' #  GT
+		below = '<=' # LTE
+		sign = node.get_sign(attributes)
+		threshold = node.get_value()
+
+		if sign == below:
+			if row[index] <= threshold:
+				# print 'below, true'
+				# exit(0)
+				return True
+			else:
+				# print 'above, false'
+				# exit(0)
+				return False
+		else: #it must be GT
+			if row[index] > threshold:
+				# print 'above, true'
+				# exit(0)
+				return True
+			else:
+				# print 'below, false'
+				# exit(0)
+				return False
+		
+def run_test(node, row, attributes):
 	class_labels = attributes.get('class').get('options')
 	negative = class_labels[0]
 	positive = class_labels[1]
 
-	return negative
+	if node.get_type() == 'nominal node':
+		index = node.get_index(attributes)
+		if row[index] == node.get_value():
+			# print 'nominal feature match!' + str(row[index])
+			if leaf_test(node) == True:
+				return node.test_instance(row, attributes)
+			else:
+				return run_test_loop(node.children, row, attributes)
+		else:
+			return False
+	else:
+		print 'need run test handling for numeric nodes'
+
+	exit(0)
+
+def run_test_loop(nodes, row, attributes):
+	for n in nodes:
+		result = is_match(n, row, attributes)
+		if result:
+			return run_test(n, row, attributes)
+		else:
+			continue
+
+	raise ValueError('No result found!!!!!!!!!!!!!!! (impossible)')
+			
+def get_prediction(nodes, row, attributes):
+	class_labels = attributes.get('class').get('options')
+	negative = class_labels[0]
+	positive = class_labels[1]
+
+	# recursively find the resulting prediction
+	return run_test_loop(nodes, row, attributes)
 
 def print_training_file_predictions(node, data, attributes):
 	""" print predictions for the test-set instances """
@@ -243,7 +315,7 @@ def print_training_file_predictions(node, data, attributes):
 	predicted_correct = 0
 	# print prediction for each instance:
 	for row in data:
-		predict = get_prediction(row, attributes)
+		predict = get_prediction(node, row, attributes)
 		if predict == row[-1]:
 			predicted_correct += 1
 		else:
@@ -284,6 +356,7 @@ def main(args):
 	# restore this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	# print_decision_tree(dtree, data, attributes)
+	# exit(0)
 
  	# now print predictions for the test-set instances
 	arff_file = load_data(test_set_file)
@@ -291,7 +364,6 @@ def main(args):
 	class_labels = attributes.get('class').get('options')
 	data = arff_file['data']
 	print_training_file_predictions(dtree.root, data, attributes)
-
 
 if __name__ == "__main__":
 	main(sys.argv)

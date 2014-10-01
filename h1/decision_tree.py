@@ -136,8 +136,15 @@ class Node(object):
 	def get_type(self):
 		return 'generic node'
 
+	def get_value(self):
+		return self.value
+
 	def is_leaf(self):
 		return self.children == []
+
+	def get_index(self, attributes):
+		index = attributes.get(self.feature).get('index')
+		return index
 
 class NumericNode(Node):
 	"""Numeric decision tree node"""
@@ -152,13 +159,20 @@ class NumericNode(Node):
 		self.thresh_def = thresh_def
 		self.children = []
 
+	def test_instance(self, row, attributes):
+		# determine which brach this row belongs to
+		# numeric; therefore we need left or right
+		print 'test_instance() not written yet'
+		exit(0)
+		pass
+
 	def get_type(self):
-		return 'nominal node'
+		return 'numeric node'
 
 	def get_thresh_def(self):
 		return self.thresh_def
 
-	def get_signs(self, attributes):
+	def get_sign(self, attributes):
 		threshold = float(self.value)
 		class_labels = attributes.get('class').get('options')
 		negative = class_labels[0]
@@ -217,8 +231,7 @@ class NumericNode(Node):
 		# thal = fixed_defect [4 6]
 		value = float(self.value)
 		base = ' [%s %s]' % (self.neg_count, self.pos_count)
-
-		sign = self.get_signs(attributes)
+		sign = self.get_sign(attributes)
 
 		# build string output for this node
 		if self.pos_count > self.neg_count:
@@ -236,51 +249,12 @@ class NumericNode(Node):
 			else:
 				pass
 
-		# find oldpeak <= 0.450000
-		# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-		# if self.feature == 'chol' and value == 232.5:
-		# 	print ''
-		# 	print obj_string
-		# 	feature_name = 'oldpeak'
-		# 	index = attributes.get(feature_name).get('index')
-		# 	midpoints, thresh_defs = get_midpoint_candidates(self.data, index, attributes)
-
-		# 	best_split = None
-		# 	data = self.data
-		# 	maxgain = -1
-
-		# 	for m in midpoints:
-		# 		left, right = build_threshold_branches(index, data, m)
-		# 		split = NumericCandidateSplit(attributes.get(feature_name), left, right, m)
-		# 		gain = info_gain(data, split, attributes)
-
-		# 		# print gain
-		# 		if gain > maxgain:
-		# 			maxgain = gain
-		# 			threshold = m
-		# 			split.thresh_def = thresh_defs.get(str(m),'')
-		# 			best_split = split
-				
-		# 	print 'midpoints'	
-		# 	print midpoints	
-		# 	print 'best_split.threshold'
-		# 	print best_split.threshold
-		# 	print 'maxgain'
-		# 	print maxgain
-		# 	
-		# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-		# trestbps maxgain == 0.811278124459
-		# oldpeak maxgain  == 0.811278124459
-		# 	exit(0)
-		# else:
-		# 	pass
-
 		return obj_string
 
 class NominalNode(Node):
 	"""Nominal decision tree node"""
 	def get_type(self):
-		return 'numeric node'
+		return 'nominal node'
 
 	def dt_print(self, is_leaf, attributes):
 		# thal = fixed_defect [4 6]
