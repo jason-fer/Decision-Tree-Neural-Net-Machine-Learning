@@ -267,24 +267,34 @@ def is_match(node, row, attributes):
 				return False
 		
 def run_test(node, row, attributes):
-	class_labels = attributes.get('class').get('options')
-	negative = class_labels[0]
-	positive = class_labels[1]
+	index = node.get_index(attributes)
 
 	if node.get_type() == 'nominal node':
-		index = node.get_index(attributes)
 		if row[index] == node.get_value():
 			# print 'nominal feature match!' + str(row[index])
 			if leaf_test(node) == True:
-				return node.test_instance(row, attributes)
+				return node.test_instance(row, attributes, index)
 			else:
 				return run_test_loop(node.children, row, attributes)
 		else:
 			return False
-	else:
-		print 'need run test handling for numeric nodes'
+	else: # this must be a numeric node
+		# we should already be on the correct node.... 
+		# print 'row[index]'
+		# print row[index]
+		# print node.feature
+		# print 'node.value (threshold)'
+		# print node.value
+		# above = '>' #  GT
+		# below = '<=' # LTE
+		# sign = node.get_sign(attributes)
+		# print sign
+		# exit(0)
+		if leaf_test(node) == True:
+			return node.test_instance(row, attributes, index)
+		else:
+			return run_test_loop(node.children, row, attributes)
 
-	exit(0)
 
 def run_test_loop(nodes, row, attributes):
 	for n in nodes:

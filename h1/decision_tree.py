@@ -159,12 +159,30 @@ class NumericNode(Node):
 		self.thresh_def = thresh_def
 		self.children = []
 
-	def test_instance(self, row, attributes):
+
+	def test_instance(self, row, attributes, index):
 		# determine which brach this row belongs to
 		# numeric; therefore we need left or right
-		print 'test_instance() not written yet'
-		exit(0)
-		pass
+		class_labels = attributes.get('class').get('options')
+		negative = class_labels[0]
+		positive = class_labels[1]
+
+		# debug
+		sign = self.get_sign(attributes)
+		threshold = self.get_value()
+		# print 'row[index]'
+		# print row[index]
+		# print 'threshold'
+		# print threshold
+		# print sign
+
+		if self.children == []:
+			if self.pos_count > self.neg_count:
+				return positive
+			else:
+				return negative
+		else:
+			raise ValueError('we ran test_instance() on a numericnode branch!')
 
 	def get_type(self):
 		return 'numeric node'
@@ -255,6 +273,35 @@ class NominalNode(Node):
 	"""Nominal decision tree node"""
 	def get_type(self):
 		return 'nominal node'
+
+	def test_instance(self, row, attributes, index):
+		# determine which brach this row belongs to
+		# numeric; therefore we need left or right
+		class_labels = attributes.get('class').get('options')
+		negative = class_labels[0]
+		positive = class_labels[1]
+
+		if self.children == []:
+			# debug
+			# print 'row[index]'
+			# print row[index]
+			# print 'value'
+			# print self.value
+			# print 'self.neg_count'
+			# print self.neg_count
+			# print 'self.pos_count'
+			# print self.pos_count
+
+			if self.pos_count > self.neg_count:
+				# print 'predict positive'
+				return positive
+				# exit(0)
+			else:
+				# print 'predict negative'
+				# exit(0)
+				return negative
+		else:
+			raise ValueError('we ran test_instance() on a numericnode branch!')
 
 	def dt_print(self, is_leaf, attributes):
 		# thal = fixed_defect [4 6]
