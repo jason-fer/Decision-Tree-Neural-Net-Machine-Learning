@@ -323,6 +323,7 @@ def print_training_file_predictions(node, data, attributes):
 	positive = class_labels[1]
 
 	predicted_correct = 0
+	count = 1
 	# print prediction for each instance:
 	for row in data:
 		predict = get_prediction(node, row, attributes)
@@ -335,7 +336,10 @@ def print_training_file_predictions(node, data, attributes):
 		for datum in row[:-1:]:
 			output_line += ' ' + str(datum)
 
+		output_line += ' #' + str(count)
+
 		print predict + ' ' + str(row[-1]) + output_line
+		count += 1
 	
 	# correctly predicted: {#correct} total instances: {len(test-set)}
 	result = 'correctly predicted: ' + str(predicted_correct)
