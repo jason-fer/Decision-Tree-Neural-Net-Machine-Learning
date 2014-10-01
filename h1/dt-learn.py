@@ -225,6 +225,41 @@ def get_arguments(args):
 
 	return train_set_file, test_set_file, m
 
+def get_prediction(row, attributes):
+	class_labels = attributes.get('class').get('options')
+	negative = class_labels[0]
+	positive = class_labels[1]
+
+	return negative
+
+def print_training_file_predictions(node, data, attributes):
+	""" print predictions for the test-set instances """
+	# for each instance print one line with spaces separating fields
+	# predicted: {label} actual: {label} field:val, field:val, etc
+	class_labels = attributes.get('class').get('options')
+	negative = class_labels[0]
+	positive = class_labels[1]
+
+	predicted_correct = 0
+	# print prediction for each instance:
+	for row in data:
+		predict = get_prediction(row, attributes)
+		if predict == row[-1]:
+			predicted_correct += 1
+		else:
+			pass
+
+		output_line = ''
+		for datum in row[:-1:]:
+			output_line += ' ' + str(datum)
+
+		print predict + ' ' + str(row[-1]) + output_line
+	
+	# correctly predicted: {#correct} total instances: {len(test-set)}
+	result = 'correctly predicted: ' + str(predicted_correct)
+	result += ' total instances: ' + str(len(data))
+	print result
+
 # incomplete (make it accept arguments)
 def main(args):
 	"""usage dt-learn <train-set-file> <test-set-file> m """
@@ -237,7 +272,6 @@ def main(args):
 	# arff_file = load_data('examples/diabetes_train.arff')
 	# arff_file = load_data('examples/heart_train.arff')
 	arff_file = load_data(train_set_file)
-	
 	attributes = get_attributes(arff_file['attributes'])
 	class_labels = attributes.get('class').get('options')
 	data = arff_file['data']
@@ -247,7 +281,16 @@ def main(args):
 	dtree.root = make_subtree(data, attributes, m)
 
 	# Output results
-	print_decision_tree(dtree, data, attributes)	
+	# restore this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	# print_decision_tree(dtree, data, attributes)
+
+ 	# now print predictions for the test-set instances
+	arff_file = load_data(test_set_file)
+	attributes = get_attributes(arff_file['attributes'])
+	class_labels = attributes.get('class').get('options')
+	data = arff_file['data']
+	print_training_file_predictions(dtree.root, data, attributes)
 
 
 if __name__ == "__main__":
