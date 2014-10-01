@@ -14,7 +14,7 @@ m = 4
 m = 2
 
 python dt-learn.py examples/diabetes_train.arff examples/diabetes_test.arff 4
-python dt-learn.py examples/heart_train.arff examples/heart_test.arff 4
+python dt-learn.py examples/heart_train.arff examples/heart_test.arff 2
 
 
 
