@@ -1,4 +1,5 @@
-from lib import arff 
+from lib import arff
+from random import shuffle
 import sys, decision_tree, helpers, math
 
 #helpers
@@ -362,15 +363,25 @@ def main(args):
 	class_labels = attributes.get('class').get('options')
 	data = arff_file['data']
 
+	# randomize data (for generating my graphs only)
+	# shuffle(data)
+	# new_data = []
+	# # heart: 10, 20, 40, 100, 200
+	# # diabetes: 33, 67, 134, 334, 668
+	# training_set_size = 334
+	# for row in data[:training_set_size]:
+	# 	new_data.append(row)
+	# # tran with less data now!!!
+	# data = new_data
+	# print len(new_data)
+	# exit(0)
+
 	# Top-down decision tree build
 	dtree = DecisionTree()
 	dtree.root = make_subtree(data, attributes, m)
 
 	# Output results
-	# restore this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	# print_decision_tree(dtree, data, attributes)
-	# exit(0)
+	print_decision_tree(dtree, data, attributes)
 
  	# now print predictions for the test-set instances
 	arff_file = load_data(test_set_file)
