@@ -10,11 +10,16 @@ m = 2  --- passed
 diabetes_train:
 m = 20 --- passed
 m = 10 --- passed
-m = 4
-m = 2
+m = 4  --- passed
+m = 2  --- passed
+
+ticetactoe (secret test):
+passed 100% also.
 
 python dt-learn.py examples/diabetes_train.arff examples/diabetes_test.arff 4
 python dt-learn.py examples/heart_train.arff examples/heart_test.arff 2
+
+python dt-learn.py examples/tictactoe_train.arff examples/tictactoe_test.arff 2
 
 
 

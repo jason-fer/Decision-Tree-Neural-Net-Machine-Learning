@@ -1,0 +1,588 @@
+
+middle-middle-square = x [183 50]
+|       bottom-right-square = x [65 16]
+|       |       top-left-square = x [49 0]: positive
+|       |       top-left-square = o [11 16]
+|       |       |       middle-right-square = x [6 8]
+|       |       |       |       top-right-square = x [4 0]: positive
+|       |       |       |       top-right-square = o [1 7]: negative
+|       |       |       |       top-right-square = b [1 1]: positive
+|       |       |       middle-right-square = o [5 3]: positive
+|       |       |       middle-right-square = b [0 5]: negative
+|       |       top-left-square = b [5 0]: positive
+|       bottom-right-square = o [60 29]
+|       |       top-left-square = x [12 18]
+|       |       |       bottom-left-square = x [6 5]
+|       |       |       |       top-right-square = x [4 0]: positive
+|       |       |       |       top-right-square = o [1 5]: negative
+|       |       |       |       top-right-square = b [1 0]: positive
+|       |       |       bottom-left-square = o [3 10]
+|       |       |       |       bottom-middle-square = x [1 1]: positive
+|       |       |       |       bottom-middle-square = o [0 8]: negative
+|       |       |       |       bottom-middle-square = b [2 1]: positive
+|       |       |       bottom-left-square = b [3 3]: positive
+|       |       top-left-square = o [22 5]
+|       |       |       top-right-square = x [13 3]
+|       |       |       |       bottom-left-square = x [7 0]: positive
+|       |       |       |       bottom-left-square = o [3 3]: positive
+|       |       |       |       bottom-left-square = b [3 0]: positive
+|       |       |       top-right-square = o [3 2]: positive
+|       |       |       top-right-square = b [6 0]: positive
+|       |       top-left-square = b [26 6]
+|       |       |       top-middle-square = x [11 3]
+|       |       |       |       bottom-middle-square = x [9 0]: positive
+|       |       |       |       bottom-middle-square = o [2 2]: positive
+|       |       |       |       bottom-middle-square = b [0 1]: negative
+|       |       |       top-middle-square = o [8 0]: positive
+|       |       |       top-middle-square = b [7 3]
+|       |       |       |       bottom-left-square = x [6 2]: positive
+|       |       |       |       bottom-left-square = o [0 1]: negative
+|       |       |       |       bottom-left-square = b [1 0]: positive
+|       bottom-right-square = b [58 5]
+|       |       top-left-square = x [12 0]: positive
+|       |       top-left-square = o [28 5]
+|       |       |       top-middle-square = x [11 0]: positive
+|       |       |       top-middle-square = o [9 4]
+|       |       |       |       top-right-square = x [6 1]: positive
+|       |       |       |       top-right-square = o [0 3]: negative
+|       |       |       |       top-right-square = b [3 0]: positive
+|       |       |       top-middle-square = b [8 1]: positive
+|       |       top-left-square = b [18 0]: positive
+middle-middle-square = o [78 97]
+|       bottom-right-square = x [51 42]
+|       |       bottom-left-square = x [32 13]
+|       |       |       bottom-middle-square = x [25 0]: positive
+|       |       |       bottom-middle-square = o [4 11]
+|       |       |       |       top-middle-square = x [2 3]: negative
+|       |       |       |       top-middle-square = o [0 7]: negative
+|       |       |       |       top-middle-square = b [2 1]: positive
+|       |       |       bottom-middle-square = b [3 2]: positive
+|       |       bottom-left-square = o [10 20]
+|       |       |       top-right-square = x [10 3]
+|       |       |       |       middle-right-square = x [8 0]: positive
+|       |       |       |       middle-right-square = o [1 2]: negative
+|       |       |       |       middle-right-square = b [1 1]: positive
+|       |       |       top-right-square = o [0 15]: negative
+|       |       |       top-right-square = b [0 2]: negative
+|       |       bottom-left-square = b [9 9]
+|       |       |       middle-right-square = x [8 1]: positive
+|       |       |       middle-right-square = o [0 6]: negative
+|       |       |       middle-right-square = b [1 2]: negative
+|       bottom-right-square = o [16 37]
+|       |       top-left-square = x [16 7]
+|       |       |       bottom-middle-square = x [5 4]: positive
+|       |       |       bottom-middle-square = o [2 2]: positive
+|       |       |       bottom-middle-square = b [9 1]
+|       |       |       |       top-right-square = x [5 0]: positive
+|       |       |       |       top-right-square = o [1 1]: positive
+|       |       |       |       top-right-square = b [3 0]: positive
+|       |       top-left-square = o [0 27]: negative
+|       |       top-left-square = b [0 3]: negative
+|       bottom-right-square = b [11 18]
+|       |       bottom-middle-square = x [1 12]
+|       |       |       top-right-square = x [1 2]: negative
+|       |       |       top-right-square = o [0 7]: negative
+|       |       |       top-right-square = b [0 3]: negative
+|       |       bottom-middle-square = o [4 4]: positive
+|       |       bottom-middle-square = b [6 2]: positive
+middle-middle-square = b [52 19]
+|       bottom-left-square = x [30 5]
+|       |       top-right-square = x [9 0]: positive
+|       |       top-right-square = o [13 5]
+|       |       |       top-middle-square = x [2 2]: positive
+|       |       |       top-middle-square = o [6 3]: positive
+|       |       |       top-middle-square = b [5 0]: positive
+|       |       top-right-square = b [8 0]: positive
+|       bottom-left-square = o [13 12]
+|       |       bottom-middle-square = x [1 5]: negative
+|       |       bottom-middle-square = o [4 5]: negative
+|       |       bottom-middle-square = b [8 2]
+|       |       |       top-left-square = x [5 0]: positive
+|       |       |       top-left-square = o [1 2]: negative
+|       |       |       top-left-square = b [2 0]: positive
+|       bottom-left-square = b [9 2]
+|       |       top-right-square = x [9 0]: positive
+|       |       top-right-square = o [0 2]: negative
+|       |       top-right-square = b [0 0]: positive
+<Predictions for the Test Set Instances>
+  1: Actual: positive  Predicted: positive
+  2: Actual: positive  Predicted: positive
+  3: Actual: positive  Predicted: positive
+  4: Actual: positive  Predicted: positive
+  5: Actual: positive  Predicted: negative
+  6: Actual: positive  Predicted: positive
+  7: Actual: positive  Predicted: positive
+  8: Actual: positive  Predicted: positive
+  9: Actual: positive  Predicted: positive
+ 10: Actual: positive  Predicted: positive
+ 11: Actual: positive  Predicted: positive
+ 12: Actual: positive  Predicted: positive
+ 13: Actual: positive  Predicted: positive
+ 14: Actual: positive  Predicted: positive
+ 15: Actual: positive  Predicted: negative
+ 16: Actual: positive  Predicted: positive
+ 17: Actual: positive  Predicted: positive
+ 18: Actual: positive  Predicted: positive
+ 19: Actual: positive  Predicted: positive
+ 20: Actual: positive  Predicted: negative
+ 21: Actual: positive  Predicted: positive
+ 22: Actual: positive  Predicted: positive
+ 23: Actual: positive  Predicted: negative
+ 24: Actual: positive  Predicted: positive
+ 25: Actual: positive  Predicted: positive
+ 26: Actual: positive  Predicted: positive
+ 27: Actual: positive  Predicted: positive
+ 28: Actual: positive  Predicted: positive
+ 29: Actual: positive  Predicted: positive
+ 30: Actual: positive  Predicted: negative
+ 31: Actual: positive  Predicted: negative
+ 32: Actual: positive  Predicted: positive
+ 33: Actual: positive  Predicted: positive
+ 34: Actual: positive  Predicted: positive
+ 35: Actual: positive  Predicted: positive
+ 36: Actual: positive  Predicted: negative
+ 37: Actual: positive  Predicted: positive
+ 38: Actual: positive  Predicted: negative
+ 39: Actual: positive  Predicted: positive
+ 40: Actual: positive  Predicted: positive
+ 41: Actual: positive  Predicted: positive
+ 42: Actual: positive  Predicted: positive
+ 43: Actual: positive  Predicted: positive
+ 44: Actual: positive  Predicted: positive
+ 45: Actual: positive  Predicted: positive
+ 46: Actual: positive  Predicted: positive
+ 47: Actual: positive  Predicted: positive
+ 48: Actual: positive  Predicted: positive
+ 49: Actual: positive  Predicted: positive
+ 50: Actual: positive  Predicted: positive
+ 51: Actual: positive  Predicted: positive
+ 52: Actual: positive  Predicted: positive
+ 53: Actual: positive  Predicted: positive
+ 54: Actual: positive  Predicted: positive
+ 55: Actual: positive  Predicted: positive
+ 56: Actual: positive  Predicted: positive
+ 57: Actual: positive  Predicted: positive
+ 58: Actual: positive  Predicted: positive
+ 59: Actual: positive  Predicted: positive
+ 60: Actual: positive  Predicted: positive
+ 61: Actual: positive  Predicted: positive
+ 62: Actual: positive  Predicted: positive
+ 63: Actual: positive  Predicted: positive
+ 64: Actual: positive  Predicted: positive
+ 65: Actual: positive  Predicted: positive
+ 66: Actual: positive  Predicted: positive
+ 67: Actual: positive  Predicted: positive
+ 68: Actual: positive  Predicted: positive
+ 69: Actual: positive  Predicted: positive
+ 70: Actual: positive  Predicted: positive
+ 71: Actual: positive  Predicted: positive
+ 72: Actual: positive  Predicted: negative
+ 73: Actual: positive  Predicted: positive
+ 74: Actual: positive  Predicted: positive
+ 75: Actual: positive  Predicted: positive
+ 76: Actual: positive  Predicted: positive
+ 77: Actual: positive  Predicted: positive
+ 78: Actual: positive  Predicted: negative
+ 79: Actual: positive  Predicted: positive
+ 80: Actual: positive  Predicted: positive
+ 81: Actual: positive  Predicted: negative
+ 82: Actual: positive  Predicted: positive
+ 83: Actual: positive  Predicted: positive
+ 84: Actual: positive  Predicted: positive
+ 85: Actual: positive  Predicted: positive
+ 86: Actual: positive  Predicted: positive
+ 87: Actual: positive  Predicted: positive
+ 88: Actual: positive  Predicted: positive
+ 89: Actual: positive  Predicted: positive
+ 90: Actual: positive  Predicted: positive
+ 91: Actual: positive  Predicted: positive
+ 92: Actual: positive  Predicted: positive
+ 93: Actual: positive  Predicted: positive
+ 94: Actual: positive  Predicted: positive
+ 95: Actual: positive  Predicted: positive
+ 96: Actual: positive  Predicted: positive
+ 97: Actual: positive  Predicted: positive
+ 98: Actual: positive  Predicted: positive
+ 99: Actual: positive  Predicted: negative
+100: Actual: positive  Predicted: positive
+101: Actual: positive  Predicted: positive
+102: Actual: positive  Predicted: positive
+103: Actual: positive  Predicted: positive
+104: Actual: positive  Predicted: positive
+105: Actual: positive  Predicted: positive
+106: Actual: positive  Predicted: positive
+107: Actual: positive  Predicted: positive
+108: Actual: positive  Predicted: positive
+109: Actual: positive  Predicted: positive
+110: Actual: positive  Predicted: positive
+111: Actual: positive  Predicted: positive
+112: Actual: positive  Predicted: positive
+113: Actual: positive  Predicted: positive
+114: Actual: positive  Predicted: positive
+115: Actual: positive  Predicted: positive
+116: Actual: positive  Predicted: positive
+117: Actual: positive  Predicted: positive
+118: Actual: positive  Predicted: negative
+119: Actual: positive  Predicted: positive
+120: Actual: positive  Predicted: positive
+121: Actual: positive  Predicted: positive
+122: Actual: positive  Predicted: positive
+123: Actual: positive  Predicted: negative
+124: Actual: positive  Predicted: positive
+125: Actual: positive  Predicted: negative
+126: Actual: positive  Predicted: positive
+127: Actual: positive  Predicted: positive
+128: Actual: positive  Predicted: positive
+129: Actual: positive  Predicted: positive
+130: Actual: positive  Predicted: positive
+131: Actual: positive  Predicted: positive
+132: Actual: positive  Predicted: positive
+133: Actual: positive  Predicted: positive
+134: Actual: positive  Predicted: positive
+135: Actual: positive  Predicted: positive
+136: Actual: positive  Predicted: positive
+137: Actual: positive  Predicted: positive
+138: Actual: positive  Predicted: positive
+139: Actual: positive  Predicted: positive
+140: Actual: positive  Predicted: positive
+141: Actual: positive  Predicted: positive
+142: Actual: positive  Predicted: positive
+143: Actual: positive  Predicted: positive
+144: Actual: positive  Predicted: positive
+145: Actual: positive  Predicted: positive
+146: Actual: positive  Predicted: positive
+147: Actual: positive  Predicted: positive
+148: Actual: positive  Predicted: positive
+149: Actual: positive  Predicted: positive
+150: Actual: positive  Predicted: positive
+151: Actual: positive  Predicted: positive
+152: Actual: positive  Predicted: positive
+153: Actual: positive  Predicted: positive
+154: Actual: positive  Predicted: positive
+155: Actual: positive  Predicted: positive
+156: Actual: positive  Predicted: positive
+157: Actual: positive  Predicted: positive
+158: Actual: positive  Predicted: positive
+159: Actual: positive  Predicted: negative
+160: Actual: positive  Predicted: positive
+161: Actual: positive  Predicted: positive
+162: Actual: positive  Predicted: positive
+163: Actual: positive  Predicted: positive
+164: Actual: positive  Predicted: positive
+165: Actual: positive  Predicted: positive
+166: Actual: positive  Predicted: positive
+167: Actual: positive  Predicted: negative
+168: Actual: positive  Predicted: positive
+169: Actual: positive  Predicted: positive
+170: Actual: positive  Predicted: positive
+171: Actual: positive  Predicted: negative
+172: Actual: positive  Predicted: positive
+173: Actual: positive  Predicted: positive
+174: Actual: positive  Predicted: positive
+175: Actual: positive  Predicted: positive
+176: Actual: positive  Predicted: positive
+177: Actual: positive  Predicted: positive
+178: Actual: positive  Predicted: positive
+179: Actual: positive  Predicted: positive
+180: Actual: positive  Predicted: positive
+181: Actual: positive  Predicted: positive
+182: Actual: positive  Predicted: positive
+183: Actual: positive  Predicted: positive
+184: Actual: positive  Predicted: positive
+185: Actual: positive  Predicted: positive
+186: Actual: positive  Predicted: positive
+187: Actual: positive  Predicted: positive
+188: Actual: positive  Predicted: positive
+189: Actual: positive  Predicted: positive
+190: Actual: positive  Predicted: negative
+191: Actual: positive  Predicted: positive
+192: Actual: positive  Predicted: positive
+193: Actual: positive  Predicted: positive
+194: Actual: positive  Predicted: negative
+195: Actual: positive  Predicted: positive
+196: Actual: positive  Predicted: positive
+197: Actual: positive  Predicted: positive
+198: Actual: positive  Predicted: positive
+199: Actual: positive  Predicted: positive
+200: Actual: positive  Predicted: negative
+201: Actual: positive  Predicted: positive
+202: Actual: positive  Predicted: positive
+203: Actual: positive  Predicted: negative
+204: Actual: positive  Predicted: positive
+205: Actual: positive  Predicted: positive
+206: Actual: positive  Predicted: positive
+207: Actual: positive  Predicted: positive
+208: Actual: positive  Predicted: positive
+209: Actual: positive  Predicted: negative
+210: Actual: positive  Predicted: positive
+211: Actual: positive  Predicted: positive
+212: Actual: positive  Predicted: positive
+213: Actual: positive  Predicted: positive
+214: Actual: positive  Predicted: positive
+215: Actual: positive  Predicted: positive
+216: Actual: positive  Predicted: positive
+217: Actual: positive  Predicted: positive
+218: Actual: positive  Predicted: positive
+219: Actual: positive  Predicted: negative
+220: Actual: positive  Predicted: positive
+221: Actual: positive  Predicted: positive
+222: Actual: positive  Predicted: positive
+223: Actual: positive  Predicted: positive
+224: Actual: positive  Predicted: positive
+225: Actual: positive  Predicted: positive
+226: Actual: positive  Predicted: positive
+227: Actual: positive  Predicted: positive
+228: Actual: positive  Predicted: positive
+229: Actual: positive  Predicted: positive
+230: Actual: positive  Predicted: positive
+231: Actual: positive  Predicted: negative
+232: Actual: positive  Predicted: negative
+233: Actual: positive  Predicted: positive
+234: Actual: positive  Predicted: negative
+235: Actual: positive  Predicted: positive
+236: Actual: positive  Predicted: positive
+237: Actual: positive  Predicted: positive
+238: Actual: positive  Predicted: positive
+239: Actual: positive  Predicted: positive
+240: Actual: positive  Predicted: positive
+241: Actual: positive  Predicted: positive
+242: Actual: positive  Predicted: positive
+243: Actual: positive  Predicted: negative
+244: Actual: positive  Predicted: positive
+245: Actual: positive  Predicted: positive
+246: Actual: positive  Predicted: positive
+247: Actual: positive  Predicted: positive
+248: Actual: positive  Predicted: positive
+249: Actual: positive  Predicted: negative
+250: Actual: positive  Predicted: positive
+251: Actual: positive  Predicted: positive
+252: Actual: positive  Predicted: positive
+253: Actual: positive  Predicted: positive
+254: Actual: positive  Predicted: positive
+255: Actual: positive  Predicted: positive
+256: Actual: positive  Predicted: positive
+257: Actual: positive  Predicted: positive
+258: Actual: positive  Predicted: positive
+259: Actual: positive  Predicted: positive
+260: Actual: positive  Predicted: positive
+261: Actual: positive  Predicted: positive
+262: Actual: positive  Predicted: positive
+263: Actual: positive  Predicted: positive
+264: Actual: positive  Predicted: positive
+265: Actual: positive  Predicted: positive
+266: Actual: positive  Predicted: positive
+267: Actual: positive  Predicted: negative
+268: Actual: positive  Predicted: positive
+269: Actual: positive  Predicted: positive
+270: Actual: positive  Predicted: positive
+271: Actual: positive  Predicted: positive
+272: Actual: positive  Predicted: positive
+273: Actual: positive  Predicted: positive
+274: Actual: positive  Predicted: negative
+275: Actual: positive  Predicted: positive
+276: Actual: positive  Predicted: positive
+277: Actual: positive  Predicted: positive
+278: Actual: positive  Predicted: positive
+279: Actual: positive  Predicted: positive
+280: Actual: positive  Predicted: positive
+281: Actual: positive  Predicted: positive
+282: Actual: positive  Predicted: positive
+283: Actual: positive  Predicted: positive
+284: Actual: positive  Predicted: positive
+285: Actual: positive  Predicted: positive
+286: Actual: positive  Predicted: positive
+287: Actual: positive  Predicted: positive
+288: Actual: positive  Predicted: positive
+289: Actual: positive  Predicted: positive
+290: Actual: positive  Predicted: positive
+291: Actual: positive  Predicted: positive
+292: Actual: positive  Predicted: positive
+293: Actual: positive  Predicted: positive
+294: Actual: positive  Predicted: positive
+295: Actual: positive  Predicted: positive
+296: Actual: positive  Predicted: positive
+297: Actual: positive  Predicted: positive
+298: Actual: positive  Predicted: positive
+299: Actual: positive  Predicted: positive
+300: Actual: positive  Predicted: positive
+301: Actual: positive  Predicted: positive
+302: Actual: positive  Predicted: positive
+303: Actual: positive  Predicted: positive
+304: Actual: positive  Predicted: negative
+305: Actual: positive  Predicted: negative
+306: Actual: positive  Predicted: positive
+307: Actual: positive  Predicted: positive
+308: Actual: positive  Predicted: positive
+309: Actual: positive  Predicted: positive
+310: Actual: positive  Predicted: positive
+311: Actual: positive  Predicted: negative
+312: Actual: positive  Predicted: positive
+313: Actual: positive  Predicted: positive
+314: Actual: negative  Predicted: positive
+315: Actual: negative  Predicted: positive
+316: Actual: negative  Predicted: negative
+317: Actual: negative  Predicted: positive
+318: Actual: negative  Predicted: negative
+319: Actual: negative  Predicted: negative
+320: Actual: negative  Predicted: negative
+321: Actual: negative  Predicted: negative
+322: Actual: negative  Predicted: negative
+323: Actual: negative  Predicted: negative
+324: Actual: negative  Predicted: positive
+325: Actual: negative  Predicted: negative
+326: Actual: negative  Predicted: positive
+327: Actual: negative  Predicted: positive
+328: Actual: negative  Predicted: negative
+329: Actual: negative  Predicted: negative
+330: Actual: negative  Predicted: negative
+331: Actual: negative  Predicted: positive
+332: Actual: negative  Predicted: negative
+333: Actual: negative  Predicted: negative
+334: Actual: negative  Predicted: negative
+335: Actual: negative  Predicted: negative
+336: Actual: negative  Predicted: negative
+337: Actual: negative  Predicted: positive
+338: Actual: negative  Predicted: negative
+339: Actual: negative  Predicted: positive
+340: Actual: negative  Predicted: positive
+341: Actual: negative  Predicted: positive
+342: Actual: negative  Predicted: negative
+343: Actual: negative  Predicted: positive
+344: Actual: negative  Predicted: negative
+345: Actual: negative  Predicted: negative
+346: Actual: negative  Predicted: negative
+347: Actual: negative  Predicted: positive
+348: Actual: negative  Predicted: negative
+349: Actual: negative  Predicted: negative
+350: Actual: negative  Predicted: positive
+351: Actual: negative  Predicted: negative
+352: Actual: negative  Predicted: positive
+353: Actual: negative  Predicted: negative
+354: Actual: negative  Predicted: negative
+355: Actual: negative  Predicted: positive
+356: Actual: negative  Predicted: positive
+357: Actual: negative  Predicted: negative
+358: Actual: negative  Predicted: negative
+359: Actual: negative  Predicted: positive
+360: Actual: negative  Predicted: positive
+361: Actual: negative  Predicted: positive
+362: Actual: negative  Predicted: negative
+363: Actual: negative  Predicted: negative
+364: Actual: negative  Predicted: negative
+365: Actual: negative  Predicted: positive
+366: Actual: negative  Predicted: negative
+367: Actual: negative  Predicted: positive
+368: Actual: negative  Predicted: negative
+369: Actual: negative  Predicted: positive
+370: Actual: negative  Predicted: negative
+371: Actual: negative  Predicted: negative
+372: Actual: negative  Predicted: negative
+373: Actual: negative  Predicted: negative
+374: Actual: negative  Predicted: negative
+375: Actual: negative  Predicted: positive
+376: Actual: negative  Predicted: positive
+377: Actual: negative  Predicted: positive
+378: Actual: negative  Predicted: negative
+379: Actual: negative  Predicted: negative
+380: Actual: negative  Predicted: negative
+381: Actual: negative  Predicted: positive
+382: Actual: negative  Predicted: negative
+383: Actual: negative  Predicted: negative
+384: Actual: negative  Predicted: positive
+385: Actual: negative  Predicted: negative
+386: Actual: negative  Predicted: negative
+387: Actual: negative  Predicted: negative
+388: Actual: negative  Predicted: negative
+389: Actual: negative  Predicted: negative
+390: Actual: negative  Predicted: negative
+391: Actual: negative  Predicted: positive
+392: Actual: negative  Predicted: negative
+393: Actual: negative  Predicted: negative
+394: Actual: negative  Predicted: negative
+395: Actual: negative  Predicted: negative
+396: Actual: negative  Predicted: negative
+397: Actual: negative  Predicted: positive
+398: Actual: negative  Predicted: negative
+399: Actual: negative  Predicted: negative
+400: Actual: negative  Predicted: negative
+401: Actual: negative  Predicted: negative
+402: Actual: negative  Predicted: positive
+403: Actual: negative  Predicted: negative
+404: Actual: negative  Predicted: negative
+405: Actual: negative  Predicted: negative
+406: Actual: negative  Predicted: negative
+407: Actual: negative  Predicted: positive
+408: Actual: negative  Predicted: negative
+409: Actual: negative  Predicted: negative
+410: Actual: negative  Predicted: negative
+411: Actual: negative  Predicted: positive
+412: Actual: negative  Predicted: positive
+413: Actual: negative  Predicted: positive
+414: Actual: negative  Predicted: negative
+415: Actual: negative  Predicted: positive
+416: Actual: negative  Predicted: negative
+417: Actual: negative  Predicted: negative
+418: Actual: negative  Predicted: positive
+419: Actual: negative  Predicted: negative
+420: Actual: negative  Predicted: negative
+421: Actual: negative  Predicted: negative
+422: Actual: negative  Predicted: negative
+423: Actual: negative  Predicted: positive
+424: Actual: negative  Predicted: negative
+425: Actual: negative  Predicted: positive
+426: Actual: negative  Predicted: negative
+427: Actual: negative  Predicted: negative
+428: Actual: negative  Predicted: negative
+429: Actual: negative  Predicted: positive
+430: Actual: negative  Predicted: positive
+431: Actual: negative  Predicted: negative
+432: Actual: negative  Predicted: negative
+433: Actual: negative  Predicted: negative
+434: Actual: negative  Predicted: positive
+435: Actual: negative  Predicted: negative
+436: Actual: negative  Predicted: negative
+437: Actual: negative  Predicted: negative
+438: Actual: negative  Predicted: positive
+439: Actual: negative  Predicted: negative
+440: Actual: negative  Predicted: positive
+441: Actual: negative  Predicted: negative
+442: Actual: negative  Predicted: negative
+443: Actual: negative  Predicted: positive
+444: Actual: negative  Predicted: negative
+445: Actual: negative  Predicted: positive
+446: Actual: negative  Predicted: positive
+447: Actual: negative  Predicted: negative
+448: Actual: negative  Predicted: positive
+449: Actual: negative  Predicted: negative
+450: Actual: negative  Predicted: negative
+451: Actual: negative  Predicted: negative
+452: Actual: negative  Predicted: negative
+453: Actual: negative  Predicted: negative
+454: Actual: negative  Predicted: positive
+455: Actual: negative  Predicted: negative
+456: Actual: negative  Predicted: positive
+457: Actual: negative  Predicted: positive
+458: Actual: negative  Predicted: positive
+459: Actual: negative  Predicted: positive
+460: Actual: negative  Predicted: positive
+461: Actual: negative  Predicted: positive
+462: Actual: negative  Predicted: negative
+463: Actual: negative  Predicted: positive
+464: Actual: negative  Predicted: negative
+465: Actual: negative  Predicted: negative
+466: Actual: negative  Predicted: positive
+467: Actual: negative  Predicted: negative
+468: Actual: negative  Predicted: positive
+469: Actual: negative  Predicted: negative
+470: Actual: negative  Predicted: positive
+471: Actual: negative  Predicted: negative
+472: Actual: negative  Predicted: positive
+473: Actual: negative  Predicted: positive
+474: Actual: negative  Predicted: negative
+475: Actual: negative  Predicted: positive
+476: Actual: negative  Predicted: positive
+477: Actual: negative  Predicted: negative
+478: Actual: negative  Predicted: negative
+479: Actual: negative  Predicted: positive
+Number of correctly classified: 381  Total number of test instances: 479
+
