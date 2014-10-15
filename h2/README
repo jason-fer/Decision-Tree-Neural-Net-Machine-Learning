@@ -1,15 +1,14 @@
 +-------------------------------------------------------------------------------
-| Homework 1
+| Homework 2
 | Author: Jason Feriante
-| Date: 21 Sep 2014
+| Date: 14 Oct 2014
 | Email: feriante@cs.wisc.edu
 | Semester: CS760 Spring 2014
 | Section: LEC 001
 | Professor: Mark Craven
 +-------------------------------------------------------------------------------
 
+Assignment:
+https://biostat.wisc.edu/~craven/cs760/hw/hw2.html
 
-This program implements an ID3-like decision-tree learner for classification.
-
-
-
+Answers to questions are in: HW2.pdf
