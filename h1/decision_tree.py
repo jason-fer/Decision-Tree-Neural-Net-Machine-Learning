@@ -1,5 +1,5 @@
 import unittest, helpers, math
-from collections import Counter
+import counter
 
 homogenous_check = helpers.homogenous_check
 get_class_counts = helpers.get_class_counts
