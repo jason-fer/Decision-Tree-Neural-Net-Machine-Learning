@@ -1,6 +1,64 @@
 cs760-homework
 ==============
 
+Homework 2:
+-how do i test this / how do i confirm my algorithm is correct
+
+Prof Kraven's advice:
+keep track of each epoch & make sure error gets smaller & smaller
+learning rate must be small enough to converge -- (i could overshoot)
+keep learning rate fixed... (rate he told us will work)
+
+-Neural Networks Pt1: 
+ask about "del"E(w) = [dE/dW0, dE/dW1, ....]  <-- is this a weight vector??
+change in weight w_i = -n dE/dW_i  <--partial derivative of error w/ respect to the current weight
+-n = learning rate
+
+-Neural Networks Pt2: 
+ask about W_ij = -n dE/dW_ij
+(ask TA to explain the math in these slides)
+
+convolutional neural networks " aiming to build web services that can do things like automatically understand natural language and recognize images."
+
+Distributed systems question:
+what is the fancy L we saw?
+
+what is a 'rich hypothesis space'???
+
+regression analysis helps one understand how the typical value of the dependent variable (or 'criterion variable') changes when any one of the independent variables is varied, while the other independent variables are held fixed. 
+
+Receiver Operating Characteristic (ROC) curve plots the TP-rate vs. the FP-rate as 
+a threshold on the confidence of an instance being positive is varied
+
+
+gradient descent... huh? (error vector or what???)
+sideways is still considered feed-forward
+feed forward = does not have cycles
+
+
+d/dx[ f(x) g(x) ] = d/dx [ f`(x)g(x) + f(x) g`(x) ] = f`(x)(g(x))^-1 + f(x)(-1)(g(x)^-2 g`(x)
+
+= f`(x)/g(x) - f(x) g`(x) / g(x)^2
+= [ f`(x) g(x) - f(x) g`(x) ] / g(x)^2
+
+
+
+Homework1:
+where p(xi,yj) is the probability that X=xi and Y=yj. This quantity should be understood as the amount of randomness in the random variable X given that you know the value of Y.
+
+conditional entropy (of two events X & Y both taking x_i and y_j values respectively): 
+H(X|Y) = 
+
+If H(Y|X=x) is the entropy of the variable Y conditioned on the variable X taking a certain value x, then H(Y|X) is the result of averaging H(Y|X=x) over all possible values x that X may take.
+
+
+Entropy of Y; H(Y) = for all Y, += - (py)log_2(py)
+
+What is the conditional entropy of Y if we condition on some other variable X?
+H(Y|X) = for all x, p(X=x) * H(Y|X=x)
+H(Y|X=x) = for all y P(Y=x|X=x)* log_2 P(Y=y|X=x)
+
+
 heart_train:
 m = 20 --- passed
 m = 10 --- passed
@@ -21,7 +79,7 @@ python dt-learn.py examples/heart_train.arff examples/heart_test.arff 2
 
 python dt-learn.py examples/tictactoe_train.arff examples/tictactoe_test.arff 2
 
-
+python dt-learn.py  /u/f/e/feriante/private/cs760/examples/tictactoe_train.arff /u/f/e/feriante/private/cs760/examples/tictactoe_test.arff 2
 
 http://stackoverflow.com/questions/2915471/install-a-python-package-into-a-different-directory-using-pip
 

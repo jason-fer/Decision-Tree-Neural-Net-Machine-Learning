@@ -1,7 +1,17 @@
 from lib import arff 
-import decision_tree
 
+def get_arguments(args):
+  if len(args) == 5:
+    train_set_file = args[1]
+    n = args[2]
+    l = args[3]
+    e = args[4]
+  else:
+    print 'usage neuralnet.py <data-set-file> n l e'
+    exit(0)
 
+  return train_set_file, n, l, e
+  
 def count_data_with_attr(data, attr):
   count = 0
   for row in data:
