@@ -85,6 +85,12 @@ def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels)
 
 
 def print_error(error, prev_error, up, down):
+    if prev_error == None:
+      prev_error = error
+      return error, up, down
+    else:
+      pass
+
     if (error - prev_error) > 0.0:
       print '+' + str(error - prev_error) + ' error:' + str(error)
       up += 1
@@ -151,8 +157,26 @@ def stratified_k_cross_folds(pos_instances, neg_instances, k_folds):
 
   return k_cross_folds
 
+def validation_test(bias, weights, validation_set, class_labels):
+  """ determine the error of the current weights vs the validation set"""
 
-def print_outputprint_output(k_cross_folds, bias, weights, data, class_labels):
+  # get the total error for this entire validation set
+  error = 0
+  for actual in validation_set:
+    # add the bias
+    net = bias
+    # add the rest of the weighted units
+    for i in range(len(actual) - 1):
+      net += weights[i] * actual[i]
+
+    o = sigmoid(net)
+    y = get_actual(actual, class_labels)
+    error += math.pow((o - y), 2) / 2.0
+
+  return error;
+
+
+def print_output(k_cross_folds, bias, weights, data, class_labels):
   """ print one line per instance in the same order as data file """
   pass
   # As output, it should print one line for each instance (in the same order as the data file) indicating (i) the fold to which the instance was assigned (1 to n), (ii) the predicted class, (iii) the actual class, (iv) the confidence of the instance being positive (i.e. the output of the sigmoid).
@@ -173,13 +197,13 @@ def main(args):
   attributes = get_attributes(arff_file['attributes'])
   class_labels = attributes.get('Class').get('options')
 
-  #weight zero = bias unit
   weights = init_weights(len(attributes))
   bias = 0.1
+
   data = arff_file['data']
 
   # debug variables
-  prev_error = 0
+  prev_error = None
   up = 0
   down = 0
 
@@ -187,39 +211,39 @@ def main(args):
   pos_instances, neg_instances = split_instances(data, class_labels)
   k_cross_folds = stratified_k_cross_folds(pos_instances, neg_instances, n)
 
+  min_error = None
+
   # run program for the specified number of epochs
-  for epoch in range(1, e):
+  for epoch in range(e):
     for v in range(n):
       # print 'on iteration k = %s of k-folds: %s' %(v, n)
-
       # get the current validation set
       validation_set = k_cross_folds[v]
-
-      # build the current training set
-      training_set = []
+      # reset variables
+      min_error = None
+      best_bias = None
+      best_weights = None
       for i in range(n):
         if i == v:
           pass # don't add the validation set!!
         else:
           for instance in k_cross_folds[i]:
             # training_set.append(fold)
-            bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
+            curr_bias, curr_weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
 
-          # now that we ran all instances, get error vs the validation set:  
-          print 'set %s had error: %s' %(i, error)
-
-      exit(0)
-      # # use the current training set
-      # for instance in training_set:
-      #   bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
-
-      # now check the model vs the validation set
-      
-    # Debug:
-    # prev_error, up, down = print_error(error, prev_error, up, down)
-
+          # now that we ran all instances, get error vs the validation set:
+          current_error = validation_test(curr_bias, curr_weights, validation_set, class_labels)
+          # print 'set %s had error: %s' %(i, current_error)
+          if min_error == None or current_error < min_error:
+            min_error = current_error
+            best_weights = curr_weights
+            best_bias = curr_bias
+      # update our results from this epoch with the best values
+      weights = best_weights
+      bias = best_bias
+      # print 'error: ' + str(min_error)
+      # prev_error, up, down = print_error(min_error, prev_error, up, down)
   # print_result(up, down, bias)
-  
   print_output(k_cross_folds, bias, weights, data, class_labels)
 
 
