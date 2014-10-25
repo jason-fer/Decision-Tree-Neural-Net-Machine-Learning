@@ -84,23 +84,6 @@ def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels)
   return bias, weights, error
 
 
-def print_error(error, prev_error, up, down):
-    if prev_error == None:
-      prev_error = error
-      return error, up, down
-    else:
-      pass
-
-    if (error - prev_error) > 0.0:
-      print '+' + str(error - prev_error) + ' error:' + str(error)
-      up += 1
-    else:
-      print str(error - prev_error) + ' error:' + str(error)
-      down += 1
-    prev_error = error
-    return prev_error, up, down
-
-
 def print_result(up, down, bias):
   print 'it was up %s' % (up)
   print 'it was down %s' % (down)
@@ -242,10 +225,7 @@ def main(args):
       weights = best_weights
       bias = best_bias
       # print 'error: ' + str(min_error)
-      # prev_error, up, down = print_error(min_error, prev_error, up, down)
-  # print_result(up, down, bias)
   print_output(k_cross_folds, bias, weights, data, class_labels)
-
 
 
 if __name__ == "__main__":
