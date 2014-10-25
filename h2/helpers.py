@@ -11,7 +11,7 @@ def get_arguments(args):
     exit(0)
 
   return train_set_file, n, l, e
-  
+
 def count_data_with_attr(data, attr):
   count = 0
   for row in data:
