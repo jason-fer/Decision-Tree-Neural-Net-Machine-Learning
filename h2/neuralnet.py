@@ -99,8 +99,8 @@ def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels)
 
   # update the bias
   error_derivative_w = p_derivative_err_out * p_derivative_out_net * bias
-  old_bias = bias
-  # bias += - learn_rate * error_derivative_w
+  # old_bias = bias
+  bias += - learn_rate * error_derivative_w
   # print 'old bias:%f, bias: %f, error_derivative_w:%f' % (old_bias, bias, error_derivative_w)
 
   # if bias != 0.1:
@@ -200,7 +200,7 @@ def get_prediction(bias, weights, actual, class_labels):
 
 def print_output(k_cross_folds, bias, weights, data, class_labels):
   """ print one line per instance in the same order as data file """
-
+  # generate a hashtable for lookups
   data_lookup = {}
   fold_number = 0
   for fold in k_cross_folds:
@@ -213,7 +213,6 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
 
   # for key in data_lookup:
   #   print data_lookup[key].get('fold_number')
-
   for row in data:
     output = ''
     key = ''
@@ -227,6 +226,7 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
     actual = row[-1]
     print 'fold:%s  predicted:%s  actual:%s  confidence:%s' %(fold_number, predicted, actual, sigmoid)
 
+
 def train_curr_fold(training_set, l, bias, weights, class_labels):
   errors = 0
   for instance in training_set:
@@ -235,6 +235,7 @@ def train_curr_fold(training_set, l, bias, weights, class_labels):
     errors += error
 
   return bias, weights, errors
+
 
 def print_weights(bias, weights, should_exit):
   print 'weights!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
@@ -245,6 +246,52 @@ def print_weights(bias, weights, should_exit):
   else:
     pass
 
+
+def print_roc_curve(bias, weights, data, class_labels):
+  results = []
+  pos = class_labels[1]
+  neg = class_labels[0]
+  num_neg, num_pos, TP, FP, last_TP, FPR, TPR = 0, 0, 0, 0, 0, 0, 0
+  # instances sorted according to predicted confidence c(i) that each instance is positive
+  # get number of negative/positive instances in the test set TP=0, FP=0!
+  for row in data:
+    if row[-1] == class_labels[1]:
+      num_pos += 1
+    else:
+      num_neg += 1
+  
+  # determine confidence for each row
+  for row in data:
+    actual = row[-1]
+    predicted, sigmoid = get_prediction(bias, weights, row, class_labels)
+    item = { 'data': row, 'predicted': predicted, 'actual': actual, 'confidence': sigmoid }
+    results.append(item)
+  # sort by confidence, ascending
+  data = sorted(results, key=lambda k: k['confidence']) 
+
+  for i in range(1, len(data)):
+    # find thresholds where there is a pos instance on high side, neg instance on low side
+    # previous data[i-1][-1] must be negative if current data[i][-1] is positive
+    # & this means the pos instance is on the high side & neg is on low side
+    if data[i][-1] != data[i-1][-1] and data[i][-1] == class_labels[1] and TP > last_TP:
+      FPR = FP / num_neg
+      TPR = TP / num_pos
+      output (FPR, TPR) coordinate
+      last_TP = TP
+    if y(i) == pos:
+      TP += 1
+    else:
+      FP += 1
+
+  FPR = FP / num_neg
+  TPR = TP / num_pos
+  output (FPR, TPR) coordinate
+
+  exit(0)
+
+  for rs in data:
+    print 'actual:%s, predicted:%s, confidence:%f'%(rs['actual'], rs['predicted'], rs['confidence'])
+
 def main(args):
   """usage neuralnet.py <data-set-file> n l e"""
   """ n = the number of folds for cross validation """
@@ -254,7 +301,7 @@ def main(args):
   # train_set_file, n, l, e = get_arguments(args)
   n = 10  # number of cross validation folds
   l = 0.1 # learning rate
-  e = 100 # training epochs
+  e = 2 # training epochs
 
   # arff_file = load_data(train_set_file)
   arff_file = load_data('examples/sonar.arff')
@@ -265,11 +312,6 @@ def main(args):
   bias = .1
 
   data = arff_file['data']
-
-  # debug variables
-  prev_error = None
-  up = 0
-  down = 0
 
   # run the current epoch (one pass through the entire training set)
   pos_instances, neg_instances = split_instances(data, class_labels)
@@ -320,14 +362,16 @@ def main(args):
         raise ValueError('(impossible)')
       else:
         pass
-      weights = best_weights
+      weights = list(best_weights)
       bias = best_bias
       # print 'error: ' + str(min_error)
     # print 'epoch: %s' %(epoch)
   # print 'after!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-  print_output(k_cross_folds, bias, weights, data, class_labels)
   # print orig_weights
   # print weights
+  # print_output(k_cross_folds, bias, weights, data, class_labels)
+
+  print_roc_curve(bias, weights, data, class_labels)
 
 if __name__ == "__main__":
   main(sys.argv)
