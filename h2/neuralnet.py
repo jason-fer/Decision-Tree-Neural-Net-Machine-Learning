@@ -28,15 +28,33 @@ def init_weights(num_features):
   return weights
 
 
-# The 'actual' number is the sigmoid activation
+# What is the 'actual' pre-determined class label?
 def get_actual(actual, class_labels):
   if actual[-1] == class_labels[0]:
     # we expected rock
-    return 0.49
+    return 0.0
   else:
     # we expected mine
-    return 0.51 # we can assume the 2nd class value is positive
+    return 1.0 # we can assume the 2nd class value is positive
 
+
+# translate sigmoid_output into a prediction value
+# in terms of accuracy, we look at 0 or 1
+def get_thresholded_value(sigmoid_output):
+  if value > 0.5:
+    return 1.0
+  else:
+    return 0.0
+
+def compute_output(bias, weights, actual):
+  # add the bias
+  net = bias
+  # add the rest of the weighted units
+  for i in range(len(actual) - 1):
+    net += weights[i] * actual[i]
+  # forward propagate net to the next layer (the sigmoid)
+  o = sigmoid(net)
+  return o
 
 def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels):
   # stochastic gradient descent algorithm:
@@ -48,38 +66,53 @@ def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels)
   #    update the weights
   #    /\w = - learn_rate * VE(w)
 
-  # add the bias
-  net = bias
-  # add the rest of the weighted units
-  for i in range(len(actual) - 1):
-    net += weights[i] * actual[i]
+  # save the old weights to test after.....
+  old_weights = list(weights)
 
-  # push the net our next layer (the sigmoid)
-  o = sigmoid(net)
+  o = compute_output(bias, weights, actual)
   # get the actual result ('rock' or 'mine')
   y = get_actual(actual, class_labels)
-
-  # sum up 1/2 the squared error distances
-  error = math.pow((o - y), 2) / 2.0
-
-  derivative_err_out = - (y - o)
-  # the derivative of the error with respect to the weight
-  derivative_out_net = o * (1 - o)
+  # apply "Delta Rule" [get the error E(w)]: sum up 1/2 the squared error distances
+  error = math.pow((y - o), 2) / 2.0
+  # print 'output o:%f, actual y:%f, dif:%f, sq_err:%f' % (o, y, (y - o), error)
   
+  # calculate the gradient
+  p_derivative_err_out = - (y - o)
+  # the derivative of the error with respect to the weight
+  p_derivative_out_net = o * (1 - o)
+  
+  # print 'p_derivative_err_out:%f, p_derivative_out_net:%f' %(p_derivative_err_out, p_derivative_out_net)
+  # print actual
+
   # calculate the partial derivative for each weight
   for i in range(len(actual) - 1):
     X_i = weights[i] * actual[i]
     # the partial error derivative with respect W_i
-    error_derivative_w = derivative_err_out * derivative_out_net * X_i
-
+    error_derivative_w = p_derivative_err_out * p_derivative_out_net * X_i
     # now we can update the weight for this item
-    weights[i] += - learn_rate * error_derivative_w
+    weight_delta = - learn_rate * error_derivative_w
+    new_weight =  weights[i] + weight_delta
+    # new_X_i = actual[i] * new_weight
+    # print 'X_i:%f, actual:%f, weight:%f, weight_delta:%f, error_derivative_w:%s' %(X_i, actual[i], weights[i], weight_delta, error_derivative_w)
+    # print 'weight before:%f, weight after:%f, X_i:%f, new X_i:%f'  % (weights[i], new_weight, X_i, new_X_i)
+    weights[i] = new_weight
 
   # update the bias
-  error_derivative_w = derivative_err_out * derivative_out_net * bias
-  bias += - learn_rate * error_derivative_w
+  error_derivative_w = p_derivative_err_out * p_derivative_out_net * bias
+  old_bias = bias
+  # bias += - learn_rate * error_derivative_w
+  # print 'old bias:%f, bias: %f, error_derivative_w:%f' % (old_bias, bias, error_derivative_w)
 
-  # return results
+  # if bias != 0.1:
+  #   # let's check before / after error on the same set!
+  #   old_output = compute_output(old_bias, old_weights, actual)
+  #   new_output = compute_output(bias, weights, actual)
+  #   expected = get_actual(actual, class_labels)
+  #   print 'old_output:%f, new_output:%f, expected:%f' % (old_output, new_output, expected)
+  #   exit(0)
+  # else:
+  #   pass
+
   return bias, weights, error
 
 
@@ -142,39 +175,14 @@ def validation_test(bias, weights, validation_set, class_labels):
   # get the total error for this entire validation set
   error = 0
   for actual in validation_set:
-    # add the bias
-    net = bias
-    # add the rest of the weighted units
-    for i in range(len(actual) - 1):
-      net += weights[i] * actual[i]
-
-    o = sigmoid(net)
+    o = compute_output(bias, weights, actual)
     y = get_actual(actual, class_labels)
     # print 'actual result:' + str(y)
     # print 'sigmoid:' + str(o)
-    error += math.pow((o - y), 2) / 2.0
+    error += math.pow((y - o), 2) / 2.0
 
-  return error;
+  return error
 
-def get_fold_number(k_cross_folds, instance):
-  fold_count = 0
-  for fold in k_cross_folds:
-    fold_count += 1
-    for row in fold:
-      match = True
-      i = 0
-      for datum in row:
-        if datum == row[i]:
-          i += 1
-          pass
-        else:
-          match = False
-          break
-      if match:
-        return fold_count
-      else:
-        pass
-    
 
 def get_prediction(bias, weights, actual, class_labels):
   net = bias
@@ -192,12 +200,32 @@ def get_prediction(bias, weights, actual, class_labels):
 
 def print_output(k_cross_folds, bias, weights, data, class_labels):
   """ print one line per instance in the same order as data file """
-  for instance in data:
+
+  data_lookup = {}
+  fold_number = 0
+  for fold in k_cross_folds:
+    fold_number += 1
+    for row in fold:
+      key = ''
+      for item in row:
+        key += str(item)
+      data_lookup[key] = {'fold_number': fold_number}
+
+  # for key in data_lookup:
+  #   print data_lookup[key].get('fold_number')
+
+  for row in data:
     output = ''
-    fold = get_fold_number(k_cross_folds, instance)
-    predicted, sigmoid = get_prediction(bias, weights, instance, class_labels)
-    actual = instance[-1]
-    print 'fold:%s  predicted:%s  actual:%s  confidence:%s' %(fold, predicted, actual, sigmoid)
+    key = ''
+    for item in row:
+      key += str(item)
+    fold_number = '-'
+    fold = data_lookup.get(key)
+    if fold != None:
+      fold_number = fold.get('fold_number')
+    predicted, sigmoid = get_prediction(bias, weights, row, class_labels)
+    actual = row[-1]
+    print 'fold:%s  predicted:%s  actual:%s  confidence:%s' %(fold_number, predicted, actual, sigmoid)
 
 def train_curr_fold(training_set, l, bias, weights, class_labels):
   errors = 0
@@ -208,9 +236,14 @@ def train_curr_fold(training_set, l, bias, weights, class_labels):
 
   return bias, weights, errors
 
-def print_weights(bias, weights):
+def print_weights(bias, weights, should_exit):
   print 'weights!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
   print bias, weights
+
+  if should_exit:
+    exit(0)
+  else:
+    pass
 
 def main(args):
   """usage neuralnet.py <data-set-file> n l e"""
@@ -242,10 +275,12 @@ def main(args):
   pos_instances, neg_instances = split_instances(data, class_labels)
   k_cross_folds = stratified_k_cross_folds(pos_instances, neg_instances, n)
 
-  min_error = None
+  # print 'before!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+  # print_output(k_cross_folds, bias, weights, data, class_labels)
 
-  # print_weights(bias, weights)
-  
+  orig_weights = list(weights)
+
+  min_error = None
   # run program for the specified number of epochs
   for epoch in range(e):
 
@@ -266,8 +301,8 @@ def main(args):
         if i == v:
           pass # don't train on the validation set!!
         else:
-          # run the current set
-          curr_bias, curr_weights, error = train_curr_fold(k_cross_folds[i], l, bias, weights, class_labels)
+          # run the current set; clone the weights (we don't want to update them accidentally!)
+          curr_bias, curr_weights, error = train_curr_fold(k_cross_folds[i], l, bias, list(weights), class_labels)
           # check the predictive power of this set
           current_error = validation_test(curr_bias, curr_weights, validation_set, class_labels)
           # print 'set %s had error: %s' %(i, current_error)
@@ -275,7 +310,7 @@ def main(args):
           # update our weights if this is better than the last set
           if min_error == None or current_error < min_error:
             min_error = current_error
-            best_weights = curr_weights
+            best_weights = list(curr_weights)
             best_bias = curr_bias
           else:
             pass
@@ -286,29 +321,29 @@ def main(args):
         pass
       weights = best_weights
       bias = best_bias
-      # print_weights(bias, weights)
-      # exit(0)
       # print 'error: ' + str(min_error)
+  # print 'after!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
   print_output(k_cross_folds, bias, weights, data, class_labels)
-
+  # print orig_weights
+  # print weights
 
 if __name__ == "__main__":
   main(sys.argv)
 
 
-  # # test..... to see if things converge
-  # for instance in data:
-  #   break
-
-  # count = 0
-  # prev_error = 100
-  # for i in range(1000):
-  #   bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
-  #   # if i % 100 == 0:
-  #   #   if error < prev_error:
-  #   #     print '-' + str(error) + ' vs prev_error:' + str(prev_error)
-  #   #   else:
-  #   #     print '+' + str(error) + ' vs prev_error:' + str(prev_error)
-  #   #   prev_error = error
-  #   count += 1
-  # exit(0)
+# def convergence_check(data, l, bias, weights, class_labels):
+#   # test..... to see if things converge
+#   for instance in data:
+#     break
+#   count = 0
+#   prev_error = 100
+#   for i in range(1000):
+#     bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
+#     # if i % 100 == 0:
+#     #   if error < prev_error:
+#     #     print '-' + str(error) + ' vs prev_error:' + str(prev_error)
+#     #   else:
+#     #     print '+' + str(error) + ' vs prev_error:' + str(prev_error)
+#     #   prev_error = error
+#     count += 1
+#   exit(0)
