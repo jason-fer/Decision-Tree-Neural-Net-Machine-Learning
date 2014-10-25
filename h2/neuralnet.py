@@ -67,25 +67,38 @@ def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels)
   # the derivative of the error with respect to the weight
   derivative_out_net = o * (1 - o)
   
-  # base * X_i will give us the partial derivative for any given unit
-  base = derivative_err_out * derivative_out_net
-
   # calculate the partial derivative for each weight
   for i in range(len(actual) - 1):
     X_i = weights[i] * actual[i]
     # the partial error derivative with respect W_i
-    error_derivative_w = base * X_i
+    error_derivative_w = derivative_err_out * derivative_out_net * X_i
 
     # now we can update the weight for this item
     weights[i] += - learn_rate * error_derivative_w
 
   # update the bias
-  error_derivative_w = base * bias
+  error_derivative_w = derivative_err_out * derivative_out_net * bias
   bias += - learn_rate * error_derivative_w
 
   # return results (incomplete)
   return bias, weights, error
 
+
+def print_error(error, prev_error, up, down):
+    if (error - prev_error) > 0.0:
+      print '+' + str(error - prev_error)
+      up += 1
+    else:
+      print str(error - prev_error)
+      down += 1
+    prev_error = error
+    return prev_error, up, down
+
+
+def print_result(up, down, bias):
+  print 'it was up %s' % (up)
+  print 'it was down %s' % (down)
+  print 'bias was: %f' %(bias)
 
 def main(args):
   """usage neuralnet.py <data-set-file> n l e"""
@@ -107,18 +120,20 @@ def main(args):
   bias = 0.1
   training_set = arff_file['data']
 
+  prev_error = 0
   # stochastic, online, gradient descent
   count = 0
-  for instance in training_set:
-    bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
-    print 'error: ' + str(error)
-    count += 1
-    if count > 20:
-      break
-    else:
-      pass
+  up = 0
+  down = 0
 
+  for i in range(1, e):
+    for instance in training_set:
+      bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
+      count += 1
 
+    prev_error, up, down = print_error(error, prev_error, up, down)
+
+  print_result(up, down, bias)
   # When the activation on the output unit (i.e. the value computed by the sigmoid) > 0.5
   # Stochasic gradient descent is used to minimize squared error
 
