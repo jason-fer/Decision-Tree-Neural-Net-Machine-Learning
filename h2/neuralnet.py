@@ -3,9 +3,7 @@ from random import shuffle
 import sys, helpers, math
 
 #helpers
-dump_attributes = helpers.dump_attributes
 load_data = helpers.load_data
-dump_splits = helpers.dump_splits
 homogenous_check = helpers.homogenous_check
 get_attributes = helpers.get_attributes
 get_class_counts = helpers.get_class_counts
@@ -84,12 +82,6 @@ def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels)
   return bias, weights, error
 
 
-def print_result(up, down, bias):
-  print 'it was up %s' % (up)
-  print 'it was down %s' % (down)
-  print 'bias was: %f' %(bias)
-
-
 def split_instances(training_set, class_labels):
   """ split training set into positive / negative samples """
   pos_instances = []
@@ -158,11 +150,49 @@ def validation_test(bias, weights, validation_set, class_labels):
 
   return error;
 
+def get_fold_number(k_cross_folds, instance):
+  fold_count = 0
+  for fold in k_cross_folds:
+    fold_count += 1
+    for row in fold:
+      match = True
+      i = 0
+      for datum in row:
+        if datum == row[i]:
+          i += 1
+          pass
+        else:
+          match = False
+          break
+      if match:
+        return fold_count
+      else:
+        pass
+    
+
+def get_prediction(bias, weights, actual, class_labels):
+  net = bias
+  # add the rest of the weighted units
+  for i in range(len(actual) - 1):
+    net += weights[i] * actual[i]
+
+  o = sigmoid(net)
+  # greater than 0.5 == positive
+  if o > 0.5:
+    return class_labels[1], o
+  else:
+    return class_labels[0], o
+
 
 def print_output(k_cross_folds, bias, weights, data, class_labels):
   """ print one line per instance in the same order as data file """
-  pass
-  # As output, it should print one line for each instance (in the same order as the data file) indicating (i) the fold to which the instance was assigned (1 to n), (ii) the predicted class, (iii) the actual class, (iv) the confidence of the instance being positive (i.e. the output of the sigmoid).
+  for instance in data:
+    output = ''
+    fold = get_fold_number(k_cross_folds, instance)
+    predicted, sigmoid = get_prediction(bias, weights, instance, class_labels)
+    actual = instance[-1]
+    print 'fold: %s predicted: %s actual: %s confidence: %s' %(fold, predicted, actual, sigmoid)
+
 
 def main(args):
   """usage neuralnet.py <data-set-file> n l e"""
@@ -173,7 +203,7 @@ def main(args):
   # train_set_file, n, l, e = get_arguments(args)
   n = 10  # number of cross validation folds
   l = 0.1 # learning rate
-  e = 100 # training epochs
+  e = 1 # training epochs
 
   # arff_file = load_data(train_set_file)
   arff_file = load_data('examples/sonar.arff')
