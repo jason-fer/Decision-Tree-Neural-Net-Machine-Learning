@@ -254,7 +254,7 @@ def main(args):
   # train_set_file, n, l, e = get_arguments(args)
   n = 10  # number of cross validation folds
   l = 0.1 # learning rate
-  e = 10 # training epochs
+  e = 100 # training epochs
 
   # arff_file = load_data(train_set_file)
   arff_file = load_data('examples/sonar.arff')
@@ -298,6 +298,7 @@ def main(args):
 
       # loop through each training set, skipping the validation set
       for i in range(n):
+        
         if i == v:
           pass # don't train on the validation set!!
         else:
@@ -322,6 +323,7 @@ def main(args):
       weights = best_weights
       bias = best_bias
       # print 'error: ' + str(min_error)
+    # print 'epoch: %s' %(epoch)
   # print 'after!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
   print_output(k_cross_folds, bias, weights, data, class_labels)
   # print orig_weights
