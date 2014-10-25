@@ -191,7 +191,7 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
     fold = get_fold_number(k_cross_folds, instance)
     predicted, sigmoid = get_prediction(bias, weights, instance, class_labels)
     actual = instance[-1]
-    print 'fold: %s predicted: %s actual: %s confidence: %s' %(fold, predicted, actual, sigmoid)
+    print 'fold:%s  predicted:%s  actual:%s  confidence:%s' %(fold, predicted, actual, sigmoid)
 
 
 def main(args):
@@ -203,7 +203,7 @@ def main(args):
   # train_set_file, n, l, e = get_arguments(args)
   n = 10  # number of cross validation folds
   l = 0.1 # learning rate
-  e = 1 # training epochs
+  e = 10 # training epochs
 
   # arff_file = load_data(train_set_file)
   arff_file = load_data('examples/sonar.arff')
@@ -252,6 +252,10 @@ def main(args):
             best_weights = curr_weights
             best_bias = curr_bias
       # update our results from this epoch with the best values
+      if best_bias == None or best_weights == None:
+        raise ValueError('(impossible)')
+      else:
+        pass
       weights = best_weights
       bias = best_bias
       # print 'error: ' + str(min_error)
