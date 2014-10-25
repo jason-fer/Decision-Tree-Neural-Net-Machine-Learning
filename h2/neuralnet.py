@@ -36,7 +36,7 @@ def get_actual(actual, class_labels):
     return 0.0
   else:
     # we expected mine
-    return 1.0
+    return 1.0 # we can assume the 2nd class value is positive
 
 
 def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels):
@@ -80,16 +80,16 @@ def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels)
   error_derivative_w = derivative_err_out * derivative_out_net * bias
   bias += - learn_rate * error_derivative_w
 
-  # return results (incomplete)
+  # return results
   return bias, weights, error
 
 
 def print_error(error, prev_error, up, down):
     if (error - prev_error) > 0.0:
-      print '+' + str(error - prev_error)
+      print '+' + str(error - prev_error) + ' error:' + str(error)
       up += 1
     else:
-      print str(error - prev_error)
+      print str(error - prev_error) + ' error:' + str(error)
       down += 1
     prev_error = error
     return prev_error, up, down
@@ -99,6 +99,63 @@ def print_result(up, down, bias):
   print 'it was up %s' % (up)
   print 'it was down %s' % (down)
   print 'bias was: %f' %(bias)
+
+
+def split_instances(training_set, class_labels):
+  """ split training set into positive / negative samples """
+  pos_instances = []
+  neg_instances = []
+
+  for instance in training_set:
+    class_type = get_actual(instance, class_labels)
+    if class_type > 0:
+      pos_instances.append(instance)
+    else:
+      neg_instances.append(instance)
+
+  return pos_instances, neg_instances
+
+
+def stratified_k_cross_folds(pos_instances, neg_instances, k_folds):
+  pos_count = len(pos_instances)
+  neg_count = len(neg_instances)
+  
+  # determine which count is less; this will determine fold_size
+  if pos_count > neg_count:
+    fold_size = neg_count / k_folds
+  else:
+    fold_size = pos_count / k_folds
+
+  shuffle(pos_instances)
+  shuffle(neg_instances)
+
+  # For stratified cross-validation, the training set will have an equal number 
+  # of patterns from each class (otherwise it isn't stratified)
+  k_cross_folds = []
+  i = 0
+  for x in range(k_folds):
+    curr_fold = []
+    for y in range(fold_size):
+      curr_fold.append(pos_instances[i])
+      curr_fold.append(neg_instances[i])
+      i += 1
+
+    shuffle(curr_fold)
+    k_cross_folds.append(curr_fold)
+
+  # check by rebuilding
+  # data = []
+  # for fold in k_cross_folds:
+  #   for x in fold:
+  #     print x
+
+  return k_cross_folds
+
+
+def print_outputprint_output(k_cross_folds, bias, weights, data, class_labels):
+  """ print one line per instance in the same order as data file """
+  pass
+  # As output, it should print one line for each instance (in the same order as the data file) indicating (i) the fold to which the instance was assigned (1 to n), (ii) the predicted class, (iii) the actual class, (iv) the confidence of the instance being positive (i.e. the output of the sigmoid).
 
 def main(args):
   """usage neuralnet.py <data-set-file> n l e"""
@@ -115,27 +172,56 @@ def main(args):
   arff_file = load_data('examples/sonar.arff')
   attributes = get_attributes(arff_file['attributes'])
   class_labels = attributes.get('Class').get('options')
+
   #weight zero = bias unit
   weights = init_weights(len(attributes))
   bias = 0.1
-  training_set = arff_file['data']
+  data = arff_file['data']
 
+  # debug variables
   prev_error = 0
-  # stochastic, online, gradient descent
-  count = 0
   up = 0
   down = 0
 
-  for i in range(1, e):
-    for instance in training_set:
-      bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
-      count += 1
+  # run the current epoch (one pass through the entire training set)
+  pos_instances, neg_instances = split_instances(data, class_labels)
+  k_cross_folds = stratified_k_cross_folds(pos_instances, neg_instances, n)
 
-    prev_error, up, down = print_error(error, prev_error, up, down)
+  # run program for the specified number of epochs
+  for epoch in range(1, e):
+    for v in range(n):
+      # print 'on iteration k = %s of k-folds: %s' %(v, n)
 
-  print_result(up, down, bias)
-  # When the activation on the output unit (i.e. the value computed by the sigmoid) > 0.5
-  # Stochasic gradient descent is used to minimize squared error
+      # get the current validation set
+      validation_set = k_cross_folds[v]
+
+      # build the current training set
+      training_set = []
+      for i in range(n):
+        if i == v:
+          pass # don't add the validation set!!
+        else:
+          for instance in k_cross_folds[i]:
+            # training_set.append(fold)
+            bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
+
+          # now that we ran all instances, get error vs the validation set:  
+          print 'set %s had error: %s' %(i, error)
+
+      exit(0)
+      # # use the current training set
+      # for instance in training_set:
+      #   bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
+
+      # now check the model vs the validation set
+      
+    # Debug:
+    # prev_error, up, down = print_error(error, prev_error, up, down)
+
+  # print_result(up, down, bias)
+  
+  print_output(k_cross_folds, bias, weights, data, class_labels)
+
 
 
 if __name__ == "__main__":

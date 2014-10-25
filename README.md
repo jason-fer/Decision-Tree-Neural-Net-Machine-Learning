@@ -3,6 +3,9 @@ cs760-homework
 
 ~/Sites/cs760/cs760-homework/h2 (master)$ python neuralnet.py the_file the_n the_l the_e
 
+cd ~/Sites/cs760/cs760-homework/h2
+python neuralnet.py the_file the_n the_l the_e
+
 
 Homework 2:
 -how do i test this / how do i confirm my algorithm is correct
