@@ -28,13 +28,14 @@ def init_weights(num_features):
   return weights
 
 
+# The 'actual' number is the sigmoid activation
 def get_actual(actual, class_labels):
   if actual[-1] == class_labels[0]:
     # we expected rock
-    return 0.0
+    return 0.49
   else:
     # we expected mine
-    return 1.0 # we can assume the 2nd class value is positive
+    return 0.51 # we can assume the 2nd class value is positive
 
 
 def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels):
@@ -89,7 +90,7 @@ def split_instances(training_set, class_labels):
 
   for instance in training_set:
     class_type = get_actual(instance, class_labels)
-    if class_type > 0:
+    if class_type > 0.5:
       pos_instances.append(instance)
     else:
       neg_instances.append(instance)
@@ -124,11 +125,14 @@ def stratified_k_cross_folds(pos_instances, neg_instances, k_folds):
     shuffle(curr_fold)
     k_cross_folds.append(curr_fold)
 
-  # check by rebuilding
-  # data = []
+  # check count
+  # count = 0
   # for fold in k_cross_folds:
-  #   for x in fold:
-  #     print x
+  #   count += len(fold)
+  #   # for x in fold:
+  #   #   print x
+  # print count
+  # exit(0)
 
   return k_cross_folds
 
@@ -146,6 +150,8 @@ def validation_test(bias, weights, validation_set, class_labels):
 
     o = sigmoid(net)
     y = get_actual(actual, class_labels)
+    # print 'actual result:' + str(y)
+    # print 'sigmoid:' + str(o)
     error += math.pow((o - y), 2) / 2.0
 
   return error;
@@ -193,6 +199,18 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
     actual = instance[-1]
     print 'fold:%s  predicted:%s  actual:%s  confidence:%s' %(fold, predicted, actual, sigmoid)
 
+def train_curr_fold(training_set, l, bias, weights, class_labels):
+  errors = 0
+  for instance in training_set:
+    # training_set.append(fold)
+    bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
+    errors += error
+
+  return bias, weights, errors
+
+def print_weights(bias, weights):
+  print 'weights!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+  print bias, weights
 
 def main(args):
   """usage neuralnet.py <data-set-file> n l e"""
@@ -211,7 +229,7 @@ def main(args):
   class_labels = attributes.get('Class').get('options')
 
   weights = init_weights(len(attributes))
-  bias = 0.1
+  bias = .1
 
   data = arff_file['data']
 
@@ -226,31 +244,41 @@ def main(args):
 
   min_error = None
 
+  # print_weights(bias, weights)
+  
   # run program for the specified number of epochs
   for epoch in range(e):
+
+    # we only update the weights once per epoch; we cross-validate all folds,
+    # then the fold that 'wins' becomes the update
     for v in range(n):
       # print 'on iteration k = %s of k-folds: %s' %(v, n)
       # get the current validation set
       validation_set = k_cross_folds[v]
+
       # reset variables
       min_error = None
       best_bias = None
       best_weights = None
+
+      # loop through each training set, skipping the validation set
       for i in range(n):
         if i == v:
-          pass # don't add the validation set!!
+          pass # don't train on the validation set!!
         else:
-          for instance in k_cross_folds[i]:
-            # training_set.append(fold)
-            curr_bias, curr_weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
-
-          # now that we ran all instances, get error vs the validation set:
+          # run the current set
+          curr_bias, curr_weights, error = train_curr_fold(k_cross_folds[i], l, bias, weights, class_labels)
+          # check the predictive power of this set
           current_error = validation_test(curr_bias, curr_weights, validation_set, class_labels)
           # print 'set %s had error: %s' %(i, current_error)
+          
+          # update our weights if this is better than the last set
           if min_error == None or current_error < min_error:
             min_error = current_error
             best_weights = curr_weights
             best_bias = curr_bias
+          else:
+            pass
       # update our results from this epoch with the best values
       if best_bias == None or best_weights == None:
         raise ValueError('(impossible)')
@@ -258,9 +286,29 @@ def main(args):
         pass
       weights = best_weights
       bias = best_bias
+      # print_weights(bias, weights)
+      # exit(0)
       # print 'error: ' + str(min_error)
   print_output(k_cross_folds, bias, weights, data, class_labels)
 
 
 if __name__ == "__main__":
   main(sys.argv)
+
+
+  # # test..... to see if things converge
+  # for instance in data:
+  #   break
+
+  # count = 0
+  # prev_error = 100
+  # for i in range(1000):
+  #   bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
+  #   # if i % 100 == 0:
+  #   #   if error < prev_error:
+  #   #     print '-' + str(error) + ' vs prev_error:' + str(prev_error)
+  #   #   else:
+  #   #     print '+' + str(error) + ' vs prev_error:' + str(prev_error)
+  #   #   prev_error = error
+  #   count += 1
+  # exit(0)
