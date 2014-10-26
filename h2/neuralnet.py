@@ -324,7 +324,7 @@ def main(args):
   # train_set_file, n, l, e = get_arguments(args)
   n = 10  # number of cross validation folds
   l = 0.1 # learning rate
-  e = 1000 # training epochs
+  e = 10000 # training epochs
 
   # arff_file = load_data(train_set_file)
   arff_file = load_data('examples/sonar.arff')
