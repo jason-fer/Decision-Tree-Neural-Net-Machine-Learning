@@ -248,10 +248,15 @@ def print_weights(bias, weights, should_exit):
 
 
 def print_roc_curve(bias, weights, data, class_labels):
-  results = []
+  """ The ROC curve is a diagnostic tool that plots the proportion of true """
+  """ positives against the proportion of false positives for all possible """
+  """ values of the threshold parameter."""
+  # with the ROC curve we manipulate the threshold, to see where the various breakpoints
+  # are where we get a tangible trade-off between false positives/ false negatives
   pos = class_labels[1]
   neg = class_labels[0]
   num_neg, num_pos, TP, FP, last_TP, FPR, TPR = 0, 0, 0, 0, 0, 0, 0
+  output = []
   # instances sorted according to predicted confidence c(i) that each instance is positive
   # get number of negative/positive instances in the test set TP=0, FP=0!
   for row in data:
@@ -261,31 +266,44 @@ def print_roc_curve(bias, weights, data, class_labels):
       num_neg += 1
   
   # determine confidence for each row
+  results = []
   for row in data:
     actual = row[-1]
     predicted, sigmoid = get_prediction(bias, weights, row, class_labels)
     item = { 'data': row, 'predicted': predicted, 'actual': actual, 'confidence': sigmoid }
     results.append(item)
   # sort by confidence, ascending
-  data = sorted(results, key=lambda k: k['confidence']) 
+  results = sorted(results, key=lambda k: k['confidence']) 
 
+
+
+  # build the ROC curve
   for i in range(1, len(data)):
     # find thresholds where there is a pos instance on high side, neg instance on low side
-    # previous data[i-1][-1] must be negative if current data[i][-1] is positive
-    # & this means the pos instance is on the high side & neg is on low side
-    if data[i][-1] != data[i-1][-1] and data[i][-1] == class_labels[1] and TP > last_TP:
+    # predicted is negative
+    curr_conf = results[i].get('predicted')
+    prev_conf = results[i - 1].get('predicted')
+    print curr_conf
+    print prev_conf
+    exit(0)
+    if curr_conf != prev_conf and data[i][-1] == neg and TP > last_TP:
       FPR = FP / num_neg
       TPR = TP / num_pos
-      output (FPR, TPR) coordinate
+      # add the new coordinate
+      output.append({'FPR':FPR, 'TPR':TPR})
       last_TP = TP
-    if y(i) == pos:
+
+    if data[i][-1] == pos:
+      # if predict pos & actual is pos, then it's true pos
       TP += 1
     else:
+      # if i predict pos & actual is neg, then it's false pos
       FP += 1
 
   FPR = FP / num_neg
   TPR = TP / num_pos
-  output (FPR, TPR) coordinate
+  
+  print output
 
   exit(0)
 
