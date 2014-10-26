@@ -276,10 +276,6 @@ def print_roc_curve(bias, weights, data, class_labels):
   # reverse the order
   results.reverse()
 
-  # for rs in results:
-  #   print 'conf:' + str(rs.get('confidence')) + ' actual:' + str(rs.get('actual'))
-  # exit(0)
-
   # for i in range(len(results)):
   #   print 'i:' + str(i) + ' conf:' + str(results[i].get('confidence')) + ' actual:' + str(results[i].get('actual'))
   # exit(0)
@@ -311,7 +307,9 @@ def print_roc_curve(bias, weights, data, class_labels):
   FPR = FP / num_neg
   TPR = TP / num_pos
   
-  print output
+  # output plot points
+  for rs in output:
+    print 'FPR: %f, TPR: %f'%(rs.get('FPR'), rs.get('TPR'))
 
   # for rs in data:
   #   print 'actual:%s, predicted:%s, confidence:%f'%(rs['actual'], rs['predicted'], rs['confidence'])
