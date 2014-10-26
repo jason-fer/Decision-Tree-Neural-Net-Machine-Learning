@@ -218,13 +218,14 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
     key = ''
     for item in row:
       key += str(item)
-    fold_number = '-'
+    fold_number = '--'
     fold = data_lookup.get(key)
     if fold != None:
-      fold_number = fold.get('fold_number')
+      fold_number = str(fold.get('fold_number'))
+      fold_number = fold_number.rjust(2, '0')
     predicted, sigmoid = get_prediction(bias, weights, row, class_labels)
     actual = row[-1]
-    print 'fold:%s  predicted:%s  actual:%s  confidence:%s' %(fold_number, predicted, actual, sigmoid)
+    print 'fold:%s  predicted:%s  actual:%s  confidence:%.4f' %(fold_number, predicted, actual, sigmoid)
 
 
 def train_curr_fold(training_set, l, bias, weights, class_labels):
@@ -323,7 +324,7 @@ def main(args):
   # train_set_file, n, l, e = get_arguments(args)
   n = 10  # number of cross validation folds
   l = 0.1 # learning rate
-  e = 5 # training epochs
+  e = 2 # training epochs
 
   # arff_file = load_data(train_set_file)
   arff_file = load_data('examples/sonar.arff')
@@ -376,6 +377,7 @@ def main(args):
             best_bias = curr_bias
           else:
             pass
+
       # update our results from this epoch with the best values
       if best_bias == None or best_weights == None:
         raise ValueError('(impossible)')
@@ -384,12 +386,12 @@ def main(args):
       weights = list(best_weights)
       bias = best_bias
   
-  # display weight issue:
-  for i in range(len(weights)):
-    print 'w%02d %.2f' %(i, weights[i])
-
   # print_output(k_cross_folds, bias, weights, data, class_labels)
   # print_roc_curve(bias, weights, data, class_labels)
+
+  # display weight issue:
+  for i in range(len(weights)):
+    print 'weight %02d %.2f' %(i, weights[i])
 
 if __name__ == "__main__":
   main(sys.argv)
