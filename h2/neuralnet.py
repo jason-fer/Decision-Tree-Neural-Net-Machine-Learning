@@ -86,7 +86,7 @@ def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels)
 
   # calculate the partial derivative for each weight
   for i in range(len(actual) - 1):
-    X_i = weights[i] * actual[i]
+    X_i = actual[i]
     # the partial error derivative with respect W_i
     error_derivative_w = p_derivative_err_out * p_derivative_out_net * X_i
     # now we can update the weight for this item
@@ -204,9 +204,7 @@ def get_prediction(bias, weights, actual, class_labels):
   else:
     return class_labels[0], o
 
-
-def print_output(k_cross_folds, bias, weights, data, class_labels):
-  """ print one line per instance in the same order as data file """
+def generate_hashmap(k_cross_folds):
   # generate a hashtable for lookups
   data_lookup = {}
   fold_number = 0
@@ -217,6 +215,13 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
       for item in row:
         key += str(item)
       data_lookup[key] = {'fold_number': fold_number}
+
+  return data_lookup
+
+def print_output(k_cross_folds, bias, weights, data, class_labels):
+  """ print one line per instance in the same order as data file """
+  # generate a hashtable for lookups
+  data_lookup = generate_hashmap(k_cross_folds)
 
   # for key in data_lookup:
   #   print data_lookup[key].get('fold_number')
@@ -250,19 +255,25 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
   training_set = []
   total = 0
   training_set_correct = 0
-  for i in range(len(k_cross_folds)):
-    for row in k_cross_folds[i]:
-      predicted, sigmoid = get_prediction(bias[i], weights[i], row, class_labels)
-      actual = row[-1]
-      if predicted == actual:
-        training_set_correct += 1
+  n = len(k_cross_folds)
+
+  for v in range(n):
+    for i in range(n):
+      if i == v:
+        pass # ignore the test set!
       else:
-        pass
-      total += 1
+        for row in k_cross_folds[i]:
+          predicted, sigmoid = get_prediction(bias[v], weights[v], row, class_labels)
+          actual = row[-1]
+          if predicted == actual:
+            training_set_correct += 1
+          else:
+            pass
+          total +=1
 
   t = total
   c = training_set_correct
-  print 'training set: predicted %d correctly. %d/%d = %f accuracy' % (c, c, t, c / float(t))
+  print 'training sets: predicted %d correctly. %d/%d = %f accuracy' % (c, c, t, c / float(t))
 
 
 def train_curr_fold(training_set, l, bias, weights, class_labels):
@@ -274,7 +285,7 @@ def train_curr_fold(training_set, l, bias, weights, class_labels):
   return bias, weights
 
 
-def print_roc_curve(bias, weights, data, class_labels):
+def print_roc_curve(bias, weights, data, class_labels, k_cross_folds):
   """ The ROC curve is a diagnostic tool that plots the proportion of true """
   """ positives against the proportion of false positives for all possible """
   """ values of the threshold parameter."""
@@ -291,11 +302,18 @@ def print_roc_curve(bias, weights, data, class_labels):
     else:
       num_neg += 1
   
+  data_lookup = generate_hashmap(k_cross_folds)
   # determine confidence for each row
   results = []
   for row in data:
+    # generate a hash key to find this row's fold number
+    key = ''
+    for item in row:
+      key += str(item)
+    fold = data_lookup.get(key)
+    i = int(fold.get('fold_number')) - 1 # switch from fold_number to zero-based index
+    predicted, sigmoid = get_prediction(bias[i], weights[i], row, class_labels)
     actual = row[-1]
-    predicted, sigmoid = get_prediction(bias, weights, row, class_labels)
     item = { 'data': row, 'predicted': predicted, 'actual': actual, 'confidence': sigmoid }
     results.append(item)
   # sort by confidence, ascending
@@ -352,6 +370,10 @@ def main(args):
   # n = 10  # number of cross validation folds
   # l = 0.1 # learning rate
   # e = 100 # training epochs
+  if n < 2:
+    raise ValueError('This K-Fold program expects n >= 2 (i.e. 2x folds minimum)')
+  else:
+    pass
 
   # arff_file = load_data(train_set_file)
   arff_file = load_data('examples/sonar.arff')
@@ -375,30 +397,28 @@ def main(args):
   min_error = None
   # run program for the specified number of epochs
   for epoch in range(e):
-
     # we only update the weights once per epoch; we cross-validate all folds,
     # then the fold that 'wins' becomes the update
     for v in range(n):
       # print 'on iteration k = %s of k-folds: %s' %(v, n)
       # get the current validation set
       validation_set = k_cross_folds[v]
-
       # loop through each training set, skipping the validation set
       for i in range(n):
-        
         if i == v:
           pass # don't train on the validation set!!
         else:
           # run the current set; clone the weights (we don't want to update them accidentally!)
-          bias[i], weights[i] = train_curr_fold(k_cross_folds[i], l, bias[i], weights[i], class_labels)
-  
+          bias[v], weights[v] = train_curr_fold(k_cross_folds[i], l, bias[v], weights[v], class_labels)
+
   print_output(k_cross_folds, bias, weights, data, class_labels)
-  # print_roc_curve(bias, weights, data, class_labels)
+  # print_roc_curve(bias, weights, data, class_labels, k_cross_folds)
 
   # display weight issue:
-  # print 'bias %.2f' %(bias)
-  # for i in range(len(weights)):
-  #   print 'weight %02d %.2f' %(i, weights[i])
+  # print 'bias %.2f' %(bias[0])
+  # for i in range(len(weights[0])):
+  #   print 'weight %02d %.2f' %(i, weights[0][i])
 
 if __name__ == "__main__":
   main(sys.argv)
+
