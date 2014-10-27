@@ -98,7 +98,7 @@ def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels)
     weights[i] = new_weight
 
   # update the bias
-  error_derivative_w = p_derivative_err_out * p_derivative_out_net * bias
+  error_derivative_w = p_derivative_err_out * p_derivative_out_net * 1
   # old_bias = bias
   bias += - learn_rate * error_derivative_w
   # print 'old bias:%f, bias: %f, error_derivative_w:%f' % (old_bias, bias, error_derivative_w)
@@ -324,7 +324,7 @@ def main(args):
   # train_set_file, n, l, e = get_arguments(args)
   n = 10  # number of cross validation folds
   l = 0.1 # learning rate
-  e = 10000 # training epochs
+  e = 100 # training epochs
 
   # arff_file = load_data(train_set_file)
   arff_file = load_data('examples/sonar.arff')
