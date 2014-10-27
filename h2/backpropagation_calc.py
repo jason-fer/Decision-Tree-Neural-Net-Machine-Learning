@@ -67,18 +67,37 @@ def main(args):
   # minimize squared error, & the learning rate is .1
   l = 0.1
   # weight_update = eta * delta * output
-  weight_delta_o1_h1   = l * 
-  weight_delta_o2_h1   = l * 
-  weight_delta_o1_h2   = l * 
-  weight_delta_o2_h2   = l * 
-  weight_delta_bias_o1 = l * 
-  weight_delta_bias_o2 = l * 
-  weight_delta_bias_h1 = l * 
-  weight_delta_bias_h2 = l * 
-  weight_delta_h1_x1   = l * 
-  weight_delta_h2_x1   = l * 
-  weight_delta_h1_x2   = l * 
-  weight_delta_h2_x2   = l * 
+  weight_delta_o1_h1   = l * o1_delta * h1
+  weight_delta_o1_h2   = l * o1_delta * h2
+  weight_delta_bias_o1 = l * o1_delta * 1
+
+  print 'weight_delta_o1_h1: %f' % (weight_delta_o1_h1)  
+  print 'weight_delta_o1_h2: %f' % (weight_delta_o1_h2)  
+  print 'weight_delta_bias_o1: %f' % (weight_delta_bias_o1)  
+
+  weight_delta_o2_h1   = l * o2_delta * h1
+  weight_delta_o2_h2   = l * o2_delta * h2
+  weight_delta_bias_o2 = l * o2_delta * 1
+
+  print 'weight_delta_o2_h1: %f' % (weight_delta_o2_h1)  
+  print 'weight_delta_o2_h2: %f' % (weight_delta_o2_h2)  
+  print 'weight_delta_bias_o2: %f' % (weight_delta_bias_o2)  
+
+  weight_delta_h1_x1   = l * h1_delta * x1
+  weight_delta_h1_x2   = l * h1_delta * x2
+  weight_delta_bias_h1 = l * h1_delta * 1
+
+  print 'weight_delta_h1_x1: %f' % (weight_delta_h1_x1)  
+  print 'weight_delta_h1_x2: %f' % (weight_delta_h1_x2)  
+  print 'weight_delta_bias_h1: %f' % (weight_delta_bias_h1)  
+
+  weight_delta_h2_x1   = l * h2_delta * x1
+  weight_delta_h2_x2   = l * h2_delta * x2
+  weight_delta_bias_h2 = l * h2_delta * 1
+
+  print 'weight_delta_h2_x1: %f' % (weight_delta_h2_x1)  
+  print 'weight_delta_h2_x2: %f' % (weight_delta_h2_x2)  
+  print 'weight_delta_bias_h2: %f' % (weight_delta_bias_h2)  
 
 
 if __name__ == "__main__":
