@@ -113,7 +113,7 @@ def stochastic_gradient_descent(learn_rate, actual, bias, weights, class_labels)
   # else:
   #   pass
 
-  return bias, weights, error
+  return bias, weights
 
 
 def split_instances(training_set, class_labels):
@@ -136,11 +136,10 @@ def stratified_k_cross_folds(pos_instances, neg_instances, k_folds):
   neg_count = len(neg_instances)
   
   # determine which count is less; this will determine fold_size
-  if pos_count > neg_count:
-    fold_size = neg_count / k_folds
-  else:
-    fold_size = pos_count / k_folds
+  n_fold_size = int( math.ceil( neg_count / float(k_folds) ) )
+  p_fold_size = int( math.ceil( pos_count / float(k_folds) ) )
 
+  # randomize
   shuffle(pos_instances)
   shuffle(neg_instances)
 
@@ -148,25 +147,33 @@ def stratified_k_cross_folds(pos_instances, neg_instances, k_folds):
   # of patterns from each class (otherwise it isn't stratified)
   k_cross_folds = []
   i = 0
+  j = 0
   for x in range(k_folds):
     curr_fold = []
-    for y in range(fold_size):
-      curr_fold.append(pos_instances[i])
-      curr_fold.append(neg_instances[i])
-      i += 1
+    for y in range(p_fold_size):
+      if i < pos_count:
+        curr_fold.append(pos_instances[i])
+        i += 1
+      else:
+        pass
+
+    for z in range(n_fold_size):
+      if j < neg_count:
+        curr_fold.append(neg_instances[j])
+        j += 1
+      else:
+        pass
 
     shuffle(curr_fold)
     k_cross_folds.append(curr_fold)
 
-  # check count
-  # count = 0
-  # for fold in k_cross_folds:
-  #   count += len(fold)
-  #   # for x in fold:
-  #   #   print x
-  # print count
-  # exit(0)
+  data = []
+  for fold in k_cross_folds:
+    for row in fold:
+      data.append(row)
 
+  # print len(data)
+  # exit(0)
   return k_cross_folds
 
 def validation_test(bias, weights, validation_set, class_labels):
@@ -214,20 +221,18 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
   # for key in data_lookup:
   #   print data_lookup[key].get('fold_number')
   correct_count = 0
-  test_set_correct = 0
-  training_set_correct = 0
   total = len(data)
   for row in data:
-    output = ''
+    # generate the hash key to find this row's fold number
     key = ''
     for item in row:
       key += str(item)
-    fold_number = '--'
+
     fold = data_lookup.get(key)
-    if fold != None:
-      fold_number = str(fold.get('fold_number'))
-      fold_number = fold_number.rjust(2, '0')
-    predicted, sigmoid = get_prediction(bias, weights, row, class_labels)
+    fold_number = str(fold.get('fold_number'))
+    i = int(fold_number) - 1 # switch from fold_number to zero-based index
+    fold_number = fold_number.rjust(2, '0')
+    predicted, sigmoid = get_prediction(bias[i], weights[i], row, class_labels)
     actual = row[-1]
     print 'fold:%s  predicted:%s  actual:%s  confidence:%.4f' %(fold_number, predicted, actual, sigmoid)
     # was the prediction correct?
@@ -236,32 +241,37 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
     else:
       pass
 
-    if predicted == actual and fold_number == '--':
-      test_set_correct += 1
-    elif predicted == actual:
-      training_set_correct += 1
-    else:
-      pass
-
   c = correct_count
   t = total
-  print 'all data: predicted %d correctly out of %d total. %d/%d = %f accuracy' % (c, t, c, t, c / float(t))
-  t = 180
+  print 'test set: predicted %d correctly. %d/%d = %f accuracy' % (c, c, t, c / float(t))
+
+  # get training set accuracy...
+  # run each generated set of weights vs the training set the weights were generated with
+  training_set = []
+  total = 0
+  training_set_correct = 0
+  for i in range(len(k_cross_folds)):
+    for row in k_cross_folds[i]:
+      predicted, sigmoid = get_prediction(bias[i], weights[i], row, class_labels)
+      actual = row[-1]
+      if predicted == actual:
+        training_set_correct += 1
+      else:
+        pass
+      total += 1
+
+  t = total
   c = training_set_correct
-  print 'training set: predicted %d correctly out of %d total. %d/%d = %f accuracy' % (c, t, c, t, c / float(t))
-  t = 28
-  c = test_set_correct
-  print 'test set: predicted %d correctly out of %d total. %d/%d = %f accuracy' % (c, t, c, t, c / float(t))
+  print 'training set: predicted %d correctly. %d/%d = %f accuracy' % (c, c, t, c / float(t))
 
 
 def train_curr_fold(training_set, l, bias, weights, class_labels):
   errors = 0
   for instance in training_set:
     # training_set.append(fold)
-    bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
-    errors += error
+    bias, weights = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
 
-  return bias, weights, errors
+  return bias, weights
 
 
 def print_roc_curve(bias, weights, data, class_labels):
@@ -347,17 +357,20 @@ def main(args):
   arff_file = load_data('examples/sonar.arff')
   attributes = get_attributes(arff_file['attributes'])
   class_labels = attributes.get('Class').get('options')
-
-  weights = init_weights(len(attributes))
-  bias = .1
-
   data = arff_file['data']
+
+  the_weights = init_weights(len(attributes))
+  the_bias = 0.1
+
+  weights = []
+  bias = []
+  for v in range(n):
+    weights.append(list(the_weights))
+    bias.append(the_bias)
 
   # run the current epoch (one pass through the entire training set)
   pos_instances, neg_instances = split_instances(data, class_labels)
   k_cross_folds = stratified_k_cross_folds(pos_instances, neg_instances, n)
-
-  orig_weights = list(weights)
 
   min_error = None
   # run program for the specified number of epochs
@@ -370,11 +383,6 @@ def main(args):
       # get the current validation set
       validation_set = k_cross_folds[v]
 
-      # reset variables
-      min_error = None
-      best_bias = None
-      best_weights = None
-
       # loop through each training set, skipping the validation set
       for i in range(n):
         
@@ -382,26 +390,7 @@ def main(args):
           pass # don't train on the validation set!!
         else:
           # run the current set; clone the weights (we don't want to update them accidentally!)
-          curr_bias, curr_weights, error = train_curr_fold(k_cross_folds[i], l, bias, list(weights), class_labels)
-          # check the predictive power of this set
-          current_error = validation_test(curr_bias, curr_weights, validation_set, class_labels)
-          # print 'set %s had error: %s' %(i, current_error)
-          
-          # update our weights if this is better than the last set
-          if min_error == None or current_error < min_error:
-            min_error = current_error
-            best_weights = list(curr_weights)
-            best_bias = curr_bias
-          else:
-            pass
-
-      # update our results from this epoch with the best values
-      if best_bias == None or best_weights == None:
-        raise ValueError('(impossible)')
-      else:
-        pass
-      weights = list(best_weights)
-      bias = best_bias
+          bias[i], weights[i] = train_curr_fold(k_cross_folds[i], l, bias[i], weights[i], class_labels)
   
   print_output(k_cross_folds, bias, weights, data, class_labels)
   # print_roc_curve(bias, weights, data, class_labels)
@@ -413,21 +402,3 @@ def main(args):
 
 if __name__ == "__main__":
   main(sys.argv)
-
-
-# def convergence_check(data, l, bias, weights, class_labels):
-#   # test..... to see if things converge
-#   for instance in data:
-#     break
-#   count = 0
-#   prev_error = 100
-#   for i in range(1000):
-#     bias, weights, error = stochastic_gradient_descent(l, instance, bias, weights, class_labels)
-#     # if i % 100 == 0:
-#     #   if error < prev_error:
-#     #     print '-' + str(error) + ' vs prev_error:' + str(prev_error)
-#     #   else:
-#     #     print '+' + str(error) + ' vs prev_error:' + str(prev_error)
-#     #   prev_error = error
-#     count += 1
-#   exit(0)
