@@ -213,6 +213,10 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
 
   # for key in data_lookup:
   #   print data_lookup[key].get('fold_number')
+  correct_count = 0
+  test_set_correct = 0
+  training_set_correct = 0
+  total = len(data)
   for row in data:
     output = ''
     key = ''
@@ -226,6 +230,28 @@ def print_output(k_cross_folds, bias, weights, data, class_labels):
     predicted, sigmoid = get_prediction(bias, weights, row, class_labels)
     actual = row[-1]
     print 'fold:%s  predicted:%s  actual:%s  confidence:%.4f' %(fold_number, predicted, actual, sigmoid)
+    # was the prediction correct?
+    if predicted == actual:
+      correct_count += 1
+    else:
+      pass
+
+    if predicted == actual and fold_number == '--':
+      test_set_correct += 1
+    elif predicted == actual:
+      training_set_correct += 1
+    else:
+      pass
+
+  c = correct_count
+  t = total
+  print 'all data: predicted %d correctly out of %d total. %d/%d = %f accuracy' % (c, t, c, t, c / float(t))
+  t = 180
+  c = training_set_correct
+  print 'training set: predicted %d correctly out of %d total. %d/%d = %f accuracy' % (c, t, c, t, c / float(t))
+  t = 28
+  c = test_set_correct
+  print 'test set: predicted %d correctly out of %d total. %d/%d = %f accuracy' % (c, t, c, t, c / float(t))
 
 
 def train_curr_fold(training_set, l, bias, weights, class_labels):
@@ -236,16 +262,6 @@ def train_curr_fold(training_set, l, bias, weights, class_labels):
     errors += error
 
   return bias, weights, errors
-
-
-def print_weights(bias, weights, should_exit):
-  print 'weights!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-  print bias, weights
-
-  if should_exit:
-    exit(0)
-  else:
-    pass
 
 
 def print_roc_curve(bias, weights, data, class_labels):
@@ -315,16 +331,17 @@ def print_roc_curve(bias, weights, data, class_labels):
   # for rs in data:
   #   print 'actual:%s, predicted:%s, confidence:%f'%(rs['actual'], rs['predicted'], rs['confidence'])
 
+
 def main(args):
   """usage neuralnet.py <data-set-file> n l e"""
   """ n = the number of folds for cross validation """
   """ l = the learning rate """
   """ e = the number of training epochs """
 
-  # train_set_file, n, l, e = get_arguments(args)
-  n = 10  # number of cross validation folds
-  l = 0.1 # learning rate
-  e = 100 # training epochs
+  train_set_file, n, l, e = get_arguments(args)
+  # n = 10  # number of cross validation folds
+  # l = 0.1 # learning rate
+  # e = 100 # training epochs
 
   # arff_file = load_data(train_set_file)
   arff_file = load_data('examples/sonar.arff')
@@ -387,11 +404,12 @@ def main(args):
       bias = best_bias
   
   print_output(k_cross_folds, bias, weights, data, class_labels)
-  print_roc_curve(bias, weights, data, class_labels)
+  # print_roc_curve(bias, weights, data, class_labels)
 
   # display weight issue:
-  for i in range(len(weights)):
-    print 'weight %02d %.2f' %(i, weights[i])
+  # print 'bias %.2f' %(bias)
+  # for i in range(len(weights)):
+  #   print 'weight %02d %.2f' %(i, weights[i])
 
 if __name__ == "__main__":
   main(sys.argv)

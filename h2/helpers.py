@@ -2,10 +2,10 @@ from lib import arff
 
 def get_arguments(args):
   if len(args) == 5:
-    train_set_file = args[1]
-    n = args[2]
-    l = args[3]
-    e = args[4]
+    train_set_file = str(args[1])
+    n = int(args[2])
+    l = float(args[3])
+    e = int(args[4])
   else:
     print 'usage neuralnet.py <data-set-file> n l e'
     exit(0)

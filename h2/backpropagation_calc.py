@@ -1,5 +1,4 @@
 """ Manually checking my answer to HW2, question #4 """
-from random import shuffle
 import sys, math
 
 def get_delta(o, y):

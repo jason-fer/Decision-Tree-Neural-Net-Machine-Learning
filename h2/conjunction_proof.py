@@ -1,6 +1,5 @@
 """ This is proof that my answer to HW2, question #3 is correct"""
 """ where y = (x1 ^ x2) v (x3 ^ x4) """
-from random import shuffle
 import sys, math
 
 def get_sigmoid(x):

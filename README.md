@@ -5,6 +5,7 @@ cs760-homework
 
 cd ~/Sites/cs760/cs760-homework/h2
 python neuralnet.py the_file the_n the_l the_e
+python neuralnet.py examples/sonar.arff 10 0.1 1
 
 
 Homework 2:
