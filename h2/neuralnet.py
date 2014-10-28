@@ -394,7 +394,6 @@ def main(args):
   pos_instances, neg_instances = split_instances(data, class_labels)
   k_cross_folds = stratified_k_cross_folds(pos_instances, neg_instances, n)
 
-  min_error = None
   # run program for the specified number of epochs
   for epoch in range(e):
     # we only update the weights once per epoch; we cross-validate all folds,
