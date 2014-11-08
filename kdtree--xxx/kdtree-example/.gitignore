@@ -1,6 +1,0 @@
-*.pyc
-.coverage
-build
-dist
-MANIFEST
-doc/_build
