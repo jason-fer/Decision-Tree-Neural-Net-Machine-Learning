@@ -20,3 +20,6 @@ Temporary Items
 *.pyc
 yelp_dataset_challenge_academic_dataset.tar
 project/data/csv
+/project/data/arff/yelp_academic_dataset_review.arff
+
+/project/data/cleaned-csv/yelp_academic_dataset_review.csv
