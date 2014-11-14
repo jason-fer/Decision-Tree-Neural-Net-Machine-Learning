@@ -3,12 +3,23 @@
 set_time_limit(0);
 require('debug.php');
 // $filename = 'yelp_academic_dataset_review.csv';
-// $filename = 'yelp_academic_dataset_business.csv';
+$filename = 'yelp_academic_dataset_business.csv';
 // $filename = 'yelp_academic_dataset_checkin.csv'; // Doesn't seem useful.
 // $filename = 'yelp_academic_dataset_tip.csv';
 // $filename = 'yelp_academic_dataset_user.csv';
 $outfile = 'data/cleaned-csv/' . $filename;
 $infile = 'data/csv/'  . $filename;
+
+function sortArrayByArray(array $unsorted, array $sortKeys)
+{
+	$sorted = [];
+	foreach ($sortKeys as $key => $value)
+	{
+		$sorted[$key] = str_replace(",", ";", $unsorted[$key]);
+	}
+
+	return $sorted;
+}
 
 // Changes to users: removed type & name
 // 	-elite becomes count of years they were elite instead of array of actual years
@@ -78,34 +89,12 @@ function generate_business_csv($infile, $outfile)
 	
 	// First line
 	$attributes = fgetcsv($handle, 0, ",",'"');
-	// echo Debug::vars($attributes); exit;
-	unset($attributes[8]);
-	unset($attributes[15]);
+	asort($attributes);
 	$rs = fputcsv($handle_out, $attributes);
 
-	$count = 0;
 	while(($line = fgetcsv($handle, 0, ",",'"')) !== false) 
 	{
-		unset($line[8]);
-		unset($line[15]);
-
-		if(strlen($line[14]) > 4)
-		{
-			$line[14] = count(explode(",", $line[14]));
-		}
-		else
-		{
-			$line[14] = '';
-		}
-
-		// $date = DateTime::createFromFormat('Y-m-d H:i:s', $line[0].'-01 00:00:00');
-		// $line[0] = $date->format('Y-m-d H:i:s');
-		// $line[16] = '"'.$line[16].'"';
-		$count++;
-		if($count > 100)
-		{
-			break;
-		}
+		$line = sortArrayByArray($line, $attributes);
 		$rs = fputcsv($handle_out, $line);
 	}
 	// if (!feof($handle)) {
