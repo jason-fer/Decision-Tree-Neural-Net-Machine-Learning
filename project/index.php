@@ -3,14 +3,14 @@
 set_time_limit(0);
 require('debug.php');
 // $filename = 'yelp_academic_dataset_review.csv';
-$filename = 'yelp_academic_dataset_business.csv';
+// $filename = 'yelp_academic_dataset_business.csv';
 // $filename = 'yelp_academic_dataset_checkin.csv'; // Doesn't seem useful.
 // $filename = 'yelp_academic_dataset_tip.csv';
-// $filename = 'yelp_academic_dataset_user.csv';
+$filename = 'yelp_academic_dataset_user.csv';
 $outfile = 'data/cleaned-csv/' . $filename;
 $infile = 'data/csv/'  . $filename;
 
-function sortArrayByArray(array $unsorted, array $sortKeys)
+function sort_array_by_keys(array $unsorted, array $sortKeys)
 {
 	$sorted = [];
 	foreach ($sortKeys as $key => $value)
@@ -33,15 +33,19 @@ function generate_user_csv($infile, $outfile)
 	// First line
 	$attributes = fgetcsv($handle, 0, ",",'"');
 	// echo Debug::vars($attributes); exit;
+	asort($attributes);
+	// Remove name & type
 	unset($attributes[8]);
 	unset($attributes[15]);
 	$rs = fputcsv($handle_out, $attributes);
 
-	$count = 0;
 	while(($line = fgetcsv($handle, 0, ",",'"')) !== false) 
 	{
+		// Remove name & type
 		unset($line[8]);
 		unset($line[15]);
+
+		$line = sort_array_by_keys($line, $attributes);
 
 		if(strlen($line[14]) > 4)
 		{
@@ -49,7 +53,7 @@ function generate_user_csv($infile, $outfile)
 		}
 		else
 		{
-			$line[14] = '';
+			$line[14] = 0;
 		}
 
 		if(strlen($line[3]) > 4)
@@ -58,7 +62,7 @@ function generate_user_csv($infile, $outfile)
 		}
 		else
 		{
-			$line[3] = '';
+			$line[3] = 0;
 		}
 
 		$date = DateTime::createFromFormat('Y-m-d H:i:s', $line[0].'-01 00:00:00');
@@ -66,13 +70,11 @@ function generate_user_csv($infile, $outfile)
 		//"2001-04-03 12:12:12"
 		$line[0] = $date->format('Y-m-d H:i:s');
 		$line[16] = '"'.$line[16].'"';
-		// echo Debug::vars($line); exit;
-		$count++;
 		$rs = fputcsv($handle_out, $line);
 	}
-	if (!feof($handle)) {
-		echo "Error: unexpected fgets() fail\n";
-	}
+	// if (!feof($handle)) {
+	// 	echo "Error: unexpected fgets() fail\n";
+	// }
 	fclose($handle);
 	fclose($handle_out);
 
@@ -94,7 +96,7 @@ function generate_business_csv($infile, $outfile)
 
 	while(($line = fgetcsv($handle, 0, ",",'"')) !== false) 
 	{
-		$line = sortArrayByArray($line, $attributes);
+		$line = sort_array_by_keys($line, $attributes);
 		$rs = fputcsv($handle_out, $line);
 	}
 	// if (!feof($handle)) {
@@ -110,7 +112,7 @@ function generate_business_csv($infile, $outfile)
 
 echo "<pre>starting task\n</pre>";
 // generate_user_csv($infile, $outfile);
-generate_business_csv($infile, $outfile);
+generate_user_csv($infile, $outfile);
 echo "<pre>All done! Generated: $outfile \n</pre>";
 
 // Changes to checkin: removed type
