@@ -1,9 +1,7 @@
-cs760-homework
+Machine learning
 ==============
 
-~/Sites/cs760/cs760-homework/h2 (master)$ python neuralnet.py the_file the_n the_l the_e
-
-cd ~/Sites/cs760/cs760-homework/h2
+.../h2 (master)$ python neuralnet.py the_file the_n the_l the_e
 python neuralnet.py the_file the_n the_l the_e
 python neuralnet.py examples/sonar.arff 10 0.1 1
 
@@ -11,7 +9,7 @@ python neuralnet.py examples/sonar.arff 10 0.1 1
 Homework 2:
 -how do i test this / how do i confirm my algorithm is correct
 
-Prof Kraven's advice:
+Prof advice:
 keep track of each epoch & make sure error gets smaller & smaller
 learning rate must be small enough to converge -- (i could overshoot)
 keep learning rate fixed... (rate he told us will work)
@@ -86,7 +84,6 @@ python dt-learn.py examples/heart_train.arff examples/heart_test.arff 2
 
 python dt-learn.py examples/tictactoe_train.arff examples/tictactoe_test.arff 2
 
-python dt-learn.py  /u/f/e/feriante/private/cs760/examples/tictactoe_train.arff /u/f/e/feriante/private/cs760/examples/tictactoe_test.arff 2
 
 http://stackoverflow.com/questions/2915471/install-a-python-package-into-a-different-directory-using-pip
 
@@ -94,10 +91,7 @@ pip install --install-option="--prefix=$PREFIX_PATH" package_name
 
 You might also want to use --ignore-installed to force all dependencies to be reinstalled using this new prefix. 
 
-pip install --install-option="--prefix=/Users/jason/Sites/cs760/cs760-homework/h1/scripts"  arff --ignore-installed
-
-
-~/Sites/cs760/cs760-homework/h1
+pip install --install-option="--prefix=/.../h1/scripts"  arff --ignore-installed
 
 
 Non ASCII characters:
@@ -107,7 +101,7 @@ Luckily in Python 2.6 you can execute directories directly. Much like executing 
 
 Emacs Speaks Statistics (ESS) is an add-on package for emacs text editors such as GNU Emacs and XEmacs
 
-pip install --install-option="–install-scripts=/Users/jason/Sites/cs760/cs760-homework/h1/scripts"  arff --ignore-installed
+pip install --install-option="–install-scripts=/.../h1/scripts"  arff --ignore-installed
 
 --install-option install-scripts=/usr/local/bin
 
